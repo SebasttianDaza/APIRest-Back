@@ -1,6 +1,6 @@
 <!-- Please update value in the {}  -->
 
-<h1 align="center">Login with PHP</h1>
+<h1 align="center">Ships Rest API</h1>
 
 <div align="center">
   <h3>
