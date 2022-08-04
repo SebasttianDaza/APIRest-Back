@@ -1,8 +1,8 @@
 {
     "conexion": {
         "host": "h9tijiuijuj7.us-east-2.psdb.cloud",
-        "user": "lrzy37d4kd57",
-        "password": "pscale_pw_78vW2T44iy3RQ9v1qadzhr_67-8RMHz_UOoAbUjc2jQ",
+        "user": "ldebqxms3z9u",
+        "password": "pscale_pw_g2wQjvQNWDjprAhog6gc_3SOxgMvoEI8m8rOXNvEcjQ",
         "database": "ships-rest"
     }
 }
