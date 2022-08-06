@@ -1,6 +1,12 @@
 <?php
-
+    error_reporting(E_ERROR);
+    //Traer vendor/autoload.php
+    require_once './vendor/autoload.php';
     require_once "./Class/Interface/interface.php";
+
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__, "../../.env");
+    $dotenv->safeLoad();
+
     class Connection implements IConnection {
 
         private $host;
@@ -11,15 +17,13 @@
 
         // Function to get information and do the connection
         function __construct() {
-            $listdate = $this->dataConnection();
+            
 
-            foreach ($listdate as $key => $value) {
-                $this->host = $value['host'];
-                $this->username = $value['user'];
-                $this->password = $value['password'];
-                $this->database = $value['database'];
-            }
-
+            $this->host = $_ENV['HOST'];
+            $this->username = $_ENV['USERNAME'];
+            $this->password = $_ENV['PASSWORD'];
+            $this->database = $_ENV['DATABASE'];
+            
             try {
                 $options = array (
                     PDO::MYSQL_ATTR_SSL_CA => "/etc/ssl/certs/ca-certificates.crt",
