@@ -1,19 +1,19 @@
 <!-- Please update value in the {}  -->
 
-<h1 align="center">Ships Rest API</h1>
+<h1 align="center">Ships Rest API Backend</h1>
 
 <div align="center">
   <h3>
-    <a href="https://{https://loginphp7.herokuapp.com/}">
+    <a href="https://{https://ships-rest.herokuapp.com/}">
       Demo
     </a>
     <span> | </span>
-    <a href="https://{[Repo](https://github.com/SebasttianDaza/LoginPHP)}">
+    <a href="https://{[Repo](https://github.com/SebasttianDaza/APIRest-Back)}">
       Solution
     </a>
     <span> | </span>
-    <a href="https://emprendeyourlifestyle.com/portafolio/">
-      Website
+    <a href="https://www.linkedin.com/in/sebasttiandaza/">
+      LinkedIn
     </a>
   </h3>
 </div>
@@ -31,34 +31,47 @@
 <!-- OVERVIEW -->
 
 ## Overview
+```bash
+[
+  {
+    "id": "1",
+    "name": "Colombia SAS",
+    "country": "Colombia",
+    "continent": "South America",
+    "coordinates": "1,1"
+  },
+  {...}
+]
 
-![screenshot](./Public/Image/imageLogin.png)
+# Example response above endpoint Embarcaciones
+```
 
-Website developed with PHP, Twig, JavaScript and MySQL, a little application that allows you to login and register. Handle to render of the views with Twig.
+API Rest developed with PHP Vanilla, MySQL and Docker, it has authentication and authorization with JWT it's API about Ships(Embarcaciones), Sales(Ventas) and Users(Usuarios).
+
+If you want to know more about the API, please visit the [API Documentation](https://www.shipsrest.software/). You feel free to collaborate with me, I'm open to any suggestions or ideas.
 
 ### Built With
 
 <!-- This section should list any major frameworks that you built your project using. Here are a few examples.-->
 
 - [PHP](https://www.php.net/)
-- [Twig](https://twig.symfony.com/)
 - [MySQL](https://www.mysql.com/)
-- [JavaScript](https://www.javascript.com/)
 - [Composer](https://getcomposer.org/)
 
 
 ## How To Use
 
+
+
 <!-- Example: -->
 
-To clone and run this application, you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:
+To clone and run this application, you'll need [Git](https://git-scm.com) and [PHP](https://www.php.net/) (which comes with [composer](https://getcomposer.org/)) installed on your computer, of course it can be NGINX or XAMP. From your command line:
 
 ```bash
 # Clone this repository
 $ git clone https://github.com/your-user-name/your-project-name
 
 # Install dependencies
-$ npm install
 $ composer install
 
 # Run the app, you can use nginx or apache
@@ -66,6 +79,5 @@ $ composer install
 
 ## Contact
 
-- Website [emprendeyourlifestyle.com](https://emprendeyourlifestyle.com/)
 - GitHub [@SebasttianDaza](https://github.com/SebasttianDaza)
 - Twitter [@SebasttianDaza](https://twitter.com/SebasttianDaza)
