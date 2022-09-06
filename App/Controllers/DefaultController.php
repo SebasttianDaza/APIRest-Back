@@ -1,27 +1,22 @@
 <?php
 
-namespace Ships\Controllers;
+    namespace Ships\Controllers;
+    require_once(__DIR__ . "../../../vendor/autoload.php");
 
-class DefaultController
-{
-    public function home(): string
-    {
-        // implement
-        return 'Hello World!';
-    }
+    
 
-    public function contact(): string
+    class DefaultController
     {
-        return 'DefaultController -> contact';
-    }
+        public function home(): string
+        {
+            $dotenv = Dotenv\Dotenv::createImmutable(__DIR__, "../../../.env");
+            $dotenv->safeLoad();
+            return redirect($_ENV["URL_HOME"], 301);
+        }
 
-    public function companies($id = null): string
-    {
-        return 'DefaultController -> companies -> id: ' . $id;
-    }
+        public function contact(): string
+        {
+            return 'DefaultController -> contact';
+        }
 
-    public function notFound(): string
-    {
-        return 'Page not found';
     }
-}
