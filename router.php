@@ -5,6 +5,7 @@
     include(__DIR__ . './App/Controllers/DefaultController.php');    
     include(__DIR__ . "./App/Controllers/ServiceController.php");
     include(__DIR__ . "./App/Controllers/APIRestController.php");
+    include(__DIR__ . "./App/Controllers/ShipsController.php");
 
     use Pecee\SimpleRouter\SimpleRouter;
 

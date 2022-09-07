@@ -7,7 +7,7 @@
     use Dotenv;
     use PDO;
     
-    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__, "../../../.env");
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__, "../../.env");
     $dotenv->safeLoad();
 
     class ConnectionController {
