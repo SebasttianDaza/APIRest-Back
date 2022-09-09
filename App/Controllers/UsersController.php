@@ -59,7 +59,7 @@
             }
 
             if (!$result) {
-                return response->json([
+                return response()->json([
                     'status' => 'error',
                     'data' => 'Don\'t exist user',
                     'code' => 404
@@ -118,7 +118,7 @@
                 }
 
                 if (!$dataToken) {
-                    return response->json([
+                    return response()->json([
                         'status' => 'error',
                         'data' => 'Unauthorized',
                         'code' => 401
