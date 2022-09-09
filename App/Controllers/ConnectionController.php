@@ -37,7 +37,7 @@
                     PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
                 );
 
-                $this->connection = new PDO("mysql:host=$this->host;dbname=$this->database;port=$this->port", $this->username, $this->password, $options);
+                $this->connection = new PDO("mysql:host=$this->host;dbname=$this->database;", $this->username, $this->password, $options);
 
             } catch (PDOException $e) {
                 $this->showError($e);
