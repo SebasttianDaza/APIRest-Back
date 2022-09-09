@@ -1,54 +1,59 @@
 <?php
     use Ships\Router;
+    require_once(__DIR__ . '../../vendor/autoload.php');
     include(__DIR__ . '../../App/Handlers/CustomExceptionHandler.php');
+
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__, "../.env");
+    $dotenv->safeLoad();
+
     
     Router::group(['exceptionHandler' => \Ships\Handlers\CustomExceptionHandler::class], function () {
 
-        Router::get('APIRest-Back/', 'DefaultController@home')->name('home');
+        Router::get($_ENV["ROUTE_MAIN"], 'DefaultController@home')->name('home');
         
-        Router::post('APIRest-Back/server/', 'ServiceController@register')->name('register');
+        Router::post($_ENV["ROUTE_MAIN"] . 'server/', 'ServiceController@register')->name('register');
 
-        Router::post('APIRest-Back/auth/', 'ServiceController@authAction')->name('auth');
+        Router::post($_ENV["ROUTE_MAIN"] . 'auth/', 'ServiceController@authAction')->name('auth');
     });
 
 
     Router::group(['exceptionHandler' => \Ships\Handlers\CustomExceptionHandler::class], function () {
 
-        Router::get('APIRest-Back/ships/{page}', 'ShipsController@getShipsAction')->name('ships');
+        Router::get($_ENV["ROUTE_MAIN"] . 'ships/{page}', 'ShipsController@getShipsAction')->name('ships');
 
-        Router::get('APIRest-Back/ship/{id}', 'ShipsController@getShipAction')->name('ship');
+        Router::get($_ENV["ROUTE_MAIN"] . 'ship/{id}', 'ShipsController@getShipAction')->name('ship');
 
-        Router::post('APIRest-Back/ships/', 'ShipsController@postShipsAction')->name('createShip');
+        Router::post($_ENV["ROUTE_MAIN"] . 'ships/', 'ShipsController@postShipsAction')->name('createShip');
 
-        Router::put('APIRest-Back/ships/', 'ShipsController@putShipsAction')->name('updateShip');
+        Router::put($_ENV["ROUTE_MAIN"] . 'ships/', 'ShipsController@putShipsAction')->name('updateShip');
 
-        Router::delete('APIRest-Back/ships/', 'ShipsController@deleteShipsAction')->name('deleteShip');
+        Router::delete($_ENV["ROUTE_MAIN"] . 'ships/', 'ShipsController@deleteShipsAction')->name('deleteShip');
     });
 
     Router::group(['exceptionHandler' => \Ships\Handlers\CustomExceptionHandler::class], function () {
 
-        Router::get('APIRest-Back/sales/{page}', 'ShipsController@getSalesAction')->name('sales');
+        Router::get($_ENV["ROUTE_MAIN"] . 'sales/{page}', 'SalesController@getSalesAction')->name('sales');
 
-        Router::get('APIRest-Back/sale/{id}', 'ShipsController@getSaleAction')->name('sale');
+        Router::get($_ENV["ROUTE_MAIN"] . 'sale/{id}', 'SalesController@getSaleAction')->name('sale');
 
-        Router::post('APIRest-Back/sales/', 'ShipsController@postSalesAction')->name('createShip');
+        Router::post($_ENV["ROUTE_MAIN"] . 'sales/', 'SalesController@postSalesAction')->name('createShip');
 
-        Router::put('APIRest-Back/sales/', 'ShipsController@putSalesAction')->name('updateSale');
+        Router::put($_ENV["ROUTE_MAIN"] . 'sales/', 'SalesController@putSalesAction')->name('updateSale');
 
-        Router::delete('APIRest-Back/sales/', 'ShipsController@deleteSalesAction')->name('deleteSales');
+        Router::delete($_ENV["ROUTE_MAIN"] . 'sales/', 'SalesController@deleteSalesAction')->name('deleteSales');
     });
 
     Router::group(['exceptionHandler' => \Ships\Handlers\CustomExceptionHandler::class], function () {
 
-        Router::get('APIRest-Back/users/{page}', 'UsersController@getUsersAction')->name('users');
+        Router::get($_ENV["ROUTE_MAIN"] . 'users/{page}', 'UsersController@getUsersAction')->name('users');
 
-        Router::get('APIRest-Back/user/{id}', 'UsersController@getUserAction')->name('user');
+        Router::get($_ENV["ROUTE_MAIN"] . 'user/{id}', 'UsersController@getUserAction')->name('user');
 
-        Router::post("APIRest-Back/users/", 'UsersController@postUsersAction')->name('createUser');
+        Router::post($_ENV["ROUTE_MAIN"] . "users/", 'UsersController@postUsersAction')->name('createUser');
 
-        Router::put('APIRest-Back/users/', 'UsersController@putUsersAction')->name('updateUser');
+        Router::put($_ENV["ROUTE_MAIN"] . 'users/', 'UsersController@putUsersAction')->name('updateUser');
 
-        Router::delete('APIRest-Back/users/', 'UsersController@deleteUsersAction')->name('deleteUser');
+        Router::delete($_ENV["ROUTE_MAIN"] . 'users/', 'UsersController@deleteUsersAction')->name('deleteUser');
     })
 
     

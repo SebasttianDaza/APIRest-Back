@@ -100,7 +100,7 @@
                         $result = $this->insertUser($data);
 
                         if ($result) {
-                            return response->json([
+                            return response()->json([
                                 'status' => 'success',
                                 'data' => $result,
                                 'code' => 200
@@ -182,7 +182,7 @@
                 $result = $this->updateUser();
 
                 if ($result) {
-                    return response->json([
+                    return response()->json([
                         'status' => 'success',
                         'data' => $result,
                         'code' => 200
@@ -269,7 +269,7 @@
                 }
 
                 if (!$result) {
-                    return response->json([
+                    return response()->json([
                         'status' => 'error',
                         'data' => 'Internal server error',
                         'code' => 500
@@ -342,7 +342,7 @@
          * 
          */
         public function getUserAction($id) : String {
-            $result = $this->getSale($id);
+            $result = $this->getUser($id);
             return $result;
         }
 
