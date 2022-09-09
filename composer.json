@@ -1,6 +1,7 @@
 {
     "require": {
         "php": "^7.4.0",
-        "vlucas/phpdotenv": "^5.4"
+        "vlucas/phpdotenv": "^5.4",
+        "pecee/simple-router": "4.3.7.2"
     }
 }

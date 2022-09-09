@@ -1,5 +1,7 @@
 <?php
 
+    namespace Ships\Interfaces;
+
     interface ReturnJson {
         public function returnResponseJSON($response);
     }

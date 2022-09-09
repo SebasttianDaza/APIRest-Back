@@ -1,56 +1,60 @@
 <?php
-    error_reporting(E_ERROR);
-    //Traer vendor/autoload.php
-    require_once './vendor/autoload.php';
-    require_once "./Class/Interface/interface.php";
+    namespace Ships\Controllers;
+    error_reporting(E_ERROR | E_PARSE);
+    
 
+    require_once(__DIR__ . '../../../vendor/autoload.php');
+    use Dotenv;
+    use PDO;
+    
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__, "../../.env");
     $dotenv->safeLoad();
 
-    class Connection implements IConnection {
+    class ConnectionController {
 
         private $host;
         private $username;
         private $password;
         private $database;
+        private $port;
         private $connection;
 
-        // Function to get information and do the connection
+        /***
+         * @Constructor
+         * @Return void
+         */
         function __construct() {
-            
 
             $this->host = $_ENV['HOST'];
             $this->username = $_ENV['USERNAME'];
             $this->password = $_ENV['PASSWORD'];
             $this->database = $_ENV['DATABASE'];
+            $this->port = $_ENV['PORT'];
             
             try {
                 $options = array (
-                    PDO::MYSQL_ATTR_SSL_CA => "/etc/ssl/certs/ca-certificates.crt",
+                    PDO::MYSQL_ATTR_SSL_CA => $_ENV['MYSQL_ATTR_SSL_CA'],
                     PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
                 );
 
-                $this->connection = new PDO('mysql:host='.$this->host.';dbname='.$this->database, $this->username, $this->password, $options);
+                $this->connection = new PDO("mysql:host=$this->host;dbname=$this->database;", $this->username, $this->password, $options);
 
             } catch (PDOException $e) {
                 $this->showError($e);
             }
         }
        
-        
-        //Function to get data about connection
-        private function dataConnection() {
-            $direction = dirname(__FILE__);
-            $jsondata = file_get_contents($direction . "/" . "config.json");
-            return json_decode($jsondata, true);
-        }
 
-        //Function to show error, if it's the case
+        /**
+         * Function to show error
+         */
         public function showError($e) {
             echo "Connection failed: " . $e->getMessage();
         }
 
-        //Change data to UTF-8
+        /**
+         * Function change UTF
+         */
         private function changeUTF8($array) {
             array_walk_recursive($array, function(&$item, $key) {
                 if(!mb_detect_encoding($item, 'utf-8', true)) {
@@ -60,7 +64,10 @@
             return $array;
         }
 
-        //Function to get data from database
+        /**
+         * Function to get data from database
+         * @Return array
+         */
         public function getData($query) {
             $result = $this->connection->query($query);
             $result = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -69,7 +76,11 @@
             $this->connection = null;
         }
 
-        //Function to insert, update or delete data in database
+        /**
+         * @Return boolean
+         * @Param string
+         * Function to insert, update or delete data in database
+         */
         public function anyQuery($sqlstr) {
             $query = $this->connection->query($sqlstr);
             
@@ -79,7 +90,11 @@
             $this->connection = null;
         }
 
-        //Function to insert
+        /**
+         * @Return number
+         * @Param string
+         * Function to insert data in database
+         */
         public function anyQueryID($sqlstr) {
             $query = $this->connection->query($sqlstr);
             if($query->rowCount() > 0) {
@@ -90,6 +105,11 @@
             $this->connection = null;
         }
 
+        /**
+         * @Return algorithm
+         * @Param string
+         * Function to encrypt data
+         */
         protected function encrypt($string) {
             return md5($string);
         }
