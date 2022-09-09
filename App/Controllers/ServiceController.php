@@ -6,7 +6,7 @@
     use Pecee\Http\Input\InputHandler;
     use Ships\Controllers; 
 
-    include(__DIR__ . "./ConnectionController.php");
+    
 
     class ServiceController extends ConnectionController {
 

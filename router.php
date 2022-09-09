@@ -2,6 +2,7 @@
     
     namespace Ships;
 
+    include(__DIR__ . "/App/Controllers/ConnectionController.php");
     include(__DIR__ . '/App/Controllers/DefaultController.php');    
     include(__DIR__ . "/App/Controllers/ServiceController.php");
     include(__DIR__ . "/App/Controllers/APIRestController.php");
