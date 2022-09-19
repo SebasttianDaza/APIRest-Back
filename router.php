@@ -23,13 +23,13 @@
         public static function start(): void
         {
             // Load our helpers
-            require_once(__DIR__ . './helpers.php');
+            require_once(__DIR__ . '/helpers.php');
 
             parent::setDefaultNamespace('Ships\Controllers');
             
 
             // Load our custom routes
-            require_once(__DIR__ . './routes/web.php');
+            require_once(__DIR__ . '/routes/web.php');
 
             // Do initial stuff
             parent::start();
