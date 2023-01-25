@@ -1,18 +1,31 @@
-version: '3.1'
+version: '3.7'
+
 services:
+  server:
+    build: ${IMAGE_SERVER}
+    container_name: ${NAME_SERVER}
+    ports:
+      - ${PORT_LOCAL_SERVER}:${PORT_CONTAINER_SERVER}
+    volumes:
+      - ${PATH_DIRECTORY_SERVER}:${PATH_DIRECTORY_SERVER_DEST}
+    depends_on:
+      - mysql
+    # Command to keep running the container - ubuntu
+    command: tail -f /dev/null
   mysql:
-    image: mysql:5.7
+    image: ${IMAGE_DATABASE}
+    container_name: ${NAME_DATABASE}
     restart: always
     ports:
-      - '3306:3306'
+      - ${PORT_LOCAL_DATABASE}:${PORT_CONTAINER_DATABASE}
     environment:
-      MYSQL_ROOT_PASSWORD: 'root'
-      MYSQL_DATABASE: 'database'
-      MYSQL_USER: 'sebasttiandaza'
-      MYSQL_PASSWORD: 'sebastianDaza100/#'
-      MYSQL_VERSION: '5.7'
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD_DATABASE}
+      MYSQL_DATABASE: ${MYSQL_NAME_DATABASE}
+      MYSQL_USER: ${MYSQL_USER_DATABASE}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD_DATABASE}
+      MYSQL_VERSION: ${MYSQL_VERSION_DATABASE}
     expose:
-      - '3306'
+      - ${PORT_CONTAINER_DATABASE}
     volumes:
       - my-db:/var/lib/mysql
 volumes:
