@@ -1,8 +1,8 @@
 version: '3.7'
 
 services:
-  server:
-    build: ${IMAGE_SERVER}
+  php-apache:
+    build: ${IMAGE_PHP}
     container_name: ${NAME_SERVER}
     ports:
       - ${PORT_LOCAL_SERVER}:${PORT_CONTAINER_SERVER}
@@ -10,8 +10,6 @@ services:
       - ${PATH_DIRECTORY_SERVER}:${PATH_DIRECTORY_SERVER_DEST}
     depends_on:
       - mysql
-    # Command to keep running the container - ubuntu
-    command: tail -f /dev/null
   mysql:
     image: ${IMAGE_DATABASE}
     container_name: ${NAME_DATABASE}
@@ -19,7 +17,7 @@ services:
     ports:
       - ${PORT_LOCAL_DATABASE}:${PORT_CONTAINER_DATABASE}
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD_DATABASE}
       MYSQL_DATABASE: ${MYSQL_NAME_DATABASE}
       MYSQL_USER: ${MYSQL_USER_DATABASE}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD_DATABASE}
