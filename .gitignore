@@ -3,6 +3,7 @@ vendor/composer
 vendor/composer/symfony
 vendor/twig
 vendor/autoload.php
+tmp
 
 
 /build/logs
