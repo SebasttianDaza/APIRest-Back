@@ -1,120 +1,138 @@
 <?php
-    namespace Ships\Controllers;
-    error_reporting(E_ERROR | E_PARSE);
-    
+namespace Ships\Controllers;
 
-    require_once(__DIR__ . '../../../vendor/autoload.php');
-    use Dotenv;
-    use PDO;
-    
-    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__, "../../.env");
-    $dotenv->safeLoad();
+error_reporting(E_ERROR | E_PARSE);
 
-    class ConnectionController {
+require_once __DIR__ . "../../../vendor/autoload.php";
+use Dotenv;
+use PDO;
+use PDOException;
 
-        private $host;
-        private $username;
-        private $password;
-        private $database;
-        private $port;
-        private $connection;
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__, "../../.env");
+$dotenv->safeLoad();
 
-        /***
-         * @Constructor
-         * @Return void
-         */
-        function __construct() {
+class ConnectionController
+{
+  private $host;
+  private $username;
+  private $password;
+  private $database;
+  private $port;
+  private $connection;
 
-            $this->host = $_ENV['HOST'];
-            $this->username = $_ENV['USERNAME'];
-            $this->password = $_ENV['PASSWORD'];
-            $this->database = $_ENV['DATABASE'];
-            $this->port = $_ENV['PORT'];
-            
-            try {
-                $options = array (
-                    PDO::MYSQL_ATTR_SSL_CA => $_ENV['MYSQL_ATTR_SSL_CA'],
-                    PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
-                );
+  /***
+   * @Constructor
+   * @Return void
+   */
+  function __construct()
+  {
+    $this->host = $_ENV["HOST"];
+    $this->username = $_ENV["USERNAME"];
+    $this->password = $_ENV["PASSWORD"];
+    $this->database = $_ENV["DATABASE"];
+    $this->port = $_ENV["PORT"];
 
-                $this->connection = new PDO("mysql:host=$this->host;dbname=$this->database;", $this->username, $this->password, $options);
+    try {
+      $options = [
+        PDO::MYSQL_ATTR_SSL_CA => $_ENV["MYSQL_ATTR_SSL_CA"],
+        PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+      ];
 
-            } catch (PDOException $e) {
-                $this->showError($e);
-            }
-        }
-       
-
-        /**
-         * Function to show error
-         */
-        public function showError($e) {
-            echo "Connection failed: " . $e->getMessage();
-        }
-
-        /**
-         * Function change UTF
-         */
-        private function changeUTF8($array) {
-            array_walk_recursive($array, function(&$item, $key) {
-                if(!mb_detect_encoding($item, 'utf-8', true)) {
-                    $item = utf8_encode($item);
-                }
-            });
-            return $array;
-        }
-
-        /**
-         * Function to get data from database
-         * @Return array
-         */
-        public function getData($query) {
-            $result = $this->connection->query($query);
-            $result = $result->fetchAll(PDO::FETCH_ASSOC);
-            $result = $this->changeUTF8($result);
-            return $result;
-            $this->connection = null;
-        }
-
-        /**
-         * @Return boolean
-         * @Param string
-         * Function to insert, update or delete data in database
-         */
-        public function anyQuery($sqlstr) {
-            $query = $this->connection->query($sqlstr);
-            
-            //Devuelve el número de filas afectadas
-            $result = $query->rowCount();
-            return $result;
-            $this->connection = null;
-        }
-
-        /**
-         * @Return number
-         * @Param string
-         * Function to insert data in database
-         */
-        public function anyQueryID($sqlstr) {
-            $query = $this->connection->query($sqlstr);
-            if($query->rowCount() > 0) {
-                return $this->connection->lastInsertId();
-            } else {
-                return 0;
-            }
-            $this->connection = null;
-        }
-
-        /**
-         * @Return algorithm
-         * @Param string
-         * Function to encrypt data
-         */
-        protected function encrypt($string) {
-            return md5($string);
-        }
-        
-
+      // Create connection
+      $this->connection = new PDO(
+        "mysql:host=$this->host;dbname=$this->database;",
+        $this->username,
+        $this->password,
+        $options
+      );
+    } catch (PDOException $e) {
+      $this->getError($e);
     }
+  }
+
+  /**
+   * @param PDOException $e
+   * @return void
+   * Show error function
+   */
+  public function getError(PDOException $e): void
+  {
+    echo "Connection failed: " . $e->getMessage();
+  }
+
+  /**
+   * Function change UTF
+   * @param array $array
+   * @return array
+   */
+  private function changeUTF8(array $array): array
+  {
+    array_walk_recursive($array, function (&$item, $key) {
+      if (!mb_detect_encoding($item, "utf-8", true)) {
+        $item = utf8_encode($item);
+      }
+    });
+
+    return $array;
+  }
+
+  /**
+   * Get data from database
+   * @param string $query
+   * @return array
+   */
+  public function getData(string $query): array
+  {
+    $result = $this->connection->query($query);
+    $result = $result->fetchAll(PDO::FETCH_ASSOC);
+    $result = $this->changeUTF8($result);
+    // Return result
+    return $result;
+    $this->connection = null;
+  }
+
+  /**
+   * Insert, update or delete data in database
+   * @param string $sqlstr
+   * @return int
+   */
+  public function anyQuery(string $sqlstr): int
+  {
+    $query = $this->connection->query($sqlstr);
+
+    // Return number of affected rows
+    $result = $query->rowCount();
+    return $result;
+    $this->connection = null;
+  }
+
+  /**
+   * Insert data in database and return last insert id
+   * @param string $sqlstr
+   * @return int
+   */
+  public function anyQueryID(string $sqlstr): int
+  {
+    // Execute query
+    $query = $this->connection->query($sqlstr);
+    if ($query->rowCount() > 0) {
+      return $this->connection->lastInsertId();
+    } else {
+      return 0;
+    }
+    // Turn off connection
+    $this->connection = null;
+  }
+
+  /**
+   * Encrypt data with md5
+   * @param string $string
+   * @return string
+   */
+  protected function encrypt(string $string): string
+  {
+    return md5($string);
+  }
+}
 
 ?>
