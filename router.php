@@ -2,13 +2,13 @@
     
     namespace Ships;
 
-    include(__DIR__ . "/App/Controllers/ConnectionController.php");
-    include(__DIR__ . '/App/Controllers/DefaultController.php');    
-    include(__DIR__ . "/App/Controllers/ServiceController.php");
-    include(__DIR__ . "/App/Controllers/APIRestController.php");
-    include(__DIR__ . "/App/Controllers/ShipsController.php");
-    include(__DIR__ . "/App/Controllers/SalesController.php");
-    include(__DIR__ . "/App/Controllers/UsersController.php");
+    require_once(__DIR__ . "/App/Controllers/UtilsController.php");
+    require_once(__DIR__ . "/App/Controllers/ConnectionController.php");
+    require_once(__DIR__ . '/App/Controllers/DefaultController.php');    
+    require_once(__DIR__ . "/App/Controllers/ServiceController.php");
+    require_once(__DIR__ . "/App/Controllers/ShipsController.php");
+    require_once(__DIR__ . "/App/Controllers/SalesController.php");
+    require_once(__DIR__ . "/App/Controllers/UsersController.php");
 
     use Pecee\SimpleRouter\SimpleRouter;
 

@@ -3,7 +3,8 @@ namespace Ships\Controllers;
 
 error_reporting(E_ERROR | E_PARSE);
 
-require_once __DIR__ . "../../../vendor/autoload.php";
+require_once(__DIR__ . "../../../vendor/autoload.php");
+use Ships\Controllers;
 use Dotenv;
 use PDO;
 use PDOException;
@@ -11,7 +12,7 @@ use PDOException;
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__, "../../.env");
 $dotenv->safeLoad();
 
-class ConnectionController
+class ConnectionController extends UtilsController
 {
   private $host;
   private $username;
@@ -133,6 +134,34 @@ class ConnectionController
   {
     return md5($string);
   }
+
+  /**
+   * Get all items from table
+   * @param string $table
+   * @return array
+   */
+  public function getItems(string $table,  int $start, int $count): array
+  {
+    $query = "SELECT * FROM $table LIMIT $start, $count";
+    $response = $this->getData($query);
+
+    return $response;
+  }
+
+  /**
+   * Get item by id
+   * @param string $table
+   * @param int $id
+   * @return array
+   */
+  public function getItemById(string $table, int $id): array
+  {
+    $query = "SELECT * FROM $table WHERE id = $id";
+    $response = $this->getData($query);
+
+    return $response;
+  }
+  
 }
 
 ?>

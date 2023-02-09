@@ -28,19 +28,28 @@ class ShipsController extends ConnectionController
       $count = $count * $page;
     }
 
-    $query = "SELECT * FROM Embarcaciones LIMIT $start, $count";
-    $result = parent::getData($query);
+    $response = parent::getItems("Embarcaciones", $start, $count);
+
+    if (!$response) {
+      response()->httpCode(404);
+      return response()->json([
+        "StatusMsg" => "Not Found",
+        "StatusCode" => 404,
+        "detail" => "No ships found",
+        "instance" => $url ?? null,
+      ]);
+    }
 
     response()->httpCode(200);
     return response()->json([
       "Page" => $page,
-			"NextPage" => $page + 1,
-			"PrevPage" => $page - 1,
+      "NextPage" => $page + 1,
+      "PrevPage" => $page - 1,
       "StatusMsg" => "OK",
       "StatusCode" => 200,
-      "Ships" => $result,
+      "Ships" => $response,
       "detail" => "It's a list of ships",
-      "instance" => $url,
+      "instance" => $url ?? null,
     ]);
   }
 
@@ -50,18 +59,27 @@ class ShipsController extends ConnectionController
    * @author SebastianDaza
    * @return json
    */
-  private function getEmbarcacion(int $id, string $url = null)
+  private function getShip(int $id, string $url = null)
   {
-    $query = "SELECT * FROM Embarcaciones WHERE id = $id";
-    $result = parent::getData($query);
+    $response = parent::getItemById("Embarcaciones", $id);
+
+    if (!$response) {
+      response()->httpCode(404);
+      return response()->json([
+        "StatusMsg" => "Not Found",
+        "StatusCode" => 404,
+        "detail" => "No ship found",
+        "instance" => $url ?? null,
+      ]);
+    }
 
     response()->httpCode(200);
     return response()->json([
       "StatusMsg" => "OK",
       "StatusCode" => 200,
-      "Ship" => $result,
+      "Ship" => $response,
       "detail" => "It's a ship",
-      "instance" => $url,
+      "instance" => $url ?? null,
     ]);
   }
 
@@ -70,12 +88,11 @@ class ShipsController extends ConnectionController
    * @param array $data
    * @return json
    */
-  public function createEmbarcacion(array $data, string $url = null)
+  private function createShip(array $data, string $url = null)
   {
-
+    // User not has token
     if (!isset($data["token"])) {
       response()->httpCode(401);
-      // User not has token
       return response()->json([
         "StatusMsg" => "Unauthorized or unauthenticated",
         "StatusCode" => 401,
@@ -84,64 +101,68 @@ class ShipsController extends ConnectionController
       ]);
     }
 
-    if (isset($data["token"])) {
+    if ($data && array_key_exists("token", $data) && isset($data["token"])) {
       $this->token = $data["token"];
-      $dataToken = $this->searchToken();
+      $tokendb = $this->searchToken();
       $tokenId;
 
-      if ($dataToken) {
-        foreach ($dataToken as $key => $value) {
-          $tokenId = $value["tokenID"];
-        }
-
-        $this->updateToken($tokenId);
-
-        if (
-          !isset($data["name"]) ||
-          !isset($data["country"]) ||
-          !isset($data["continent"]) ||
-          !isset($data["coordinates"])
-        ) {
-          response()->httpCode(400);
-          return response()->json([
-            "StatusMsg" => "Bad request",
-            "StatusCode" => 400,
-						"detail" => "You need to send all information",
-						"instance" => $url,
-          ]);
-        } else {
-          $this->insertEmbarcacion($data);
-
-          if ($result) {
-            response()->httpCode(201);
-            return response()->json([
-              "StatusMsg" => "OK",
-              "StatusCode" => 201,
-							"detail" => "Ship created",
-              "data" => $result,
-							"instance" => $url,
-            ]);
-          }
-
-          if (!$result) {
-            response()->httpCode(500);
-            return response()->json([
-              "StatusMsg" => "Internal server error",
-              "StatusCode" => 500,
-							"detail" => "Ship not created",
-							"instance" => $url,
-            ]);
-          }
-        }
-      }
-
-      if (!$dataToken) {
+      // No token found
+      if (!$tokendb) {
         response()->httpCode(401);
         return response()->json([
           "StatusMsg" => "Unauthorized or unauthenticated",
           "StatusCode" => 401,
-					"detail" => "You need a token to create a ship",
-					"instance" => $url,
+          "detail" => "You need a token to create a ship",
+          "instance" => $url,
+        ]);
+      }
+
+      foreach ($tokendb as $key => $value) {
+        $tokenId = $value["tokenID"];
+      }
+
+      // Update token
+      $this->updateToken($tokenId);
+
+      if (
+        !array_key_exists("name", $data) ||
+        !isset($data["name"]) ||
+        !array_key_exists("country", $data) ||
+        !isset($data["country"]) ||
+        !array_key_exists("continent", $data) ||
+        !isset($data["continent"]) ||
+        !array_key_exists("coordinates", $data) ||
+        !isset($data["coordinates"])
+      ) {
+        response()->httpCode(400);
+        return response()->json([
+          "StatusMsg" => "Bad request",
+          "StatusCode" => 400,
+          "detail" => "You need to send all information",
+          "instance" => $url,
+        ]);
+      } else {
+        // Insert ship
+        $result = $this->insertShip($data);
+
+        // Error in insert
+        if (!$result) {
+          response()->httpCode(500);
+          return response()->json([
+            "StatusMsg" => "Internal server error",
+            "StatusCode" => 500,
+            "detail" => "Ship not created",
+            "instance" => $url,
+          ]);
+        }
+
+        response()->httpCode(201);
+        return response()->json([
+          "StatusMsg" => "OK",
+          "StatusCode" => 201,
+          "detail" => "Ship created",
+          "data" => $result,
+          "instance" => $url,
         ]);
       }
     }
@@ -151,7 +172,7 @@ class ShipsController extends ConnectionController
    *  @param array $data
    *  @return json
    */
-  private function insertEmbarcacion(array $data)
+  private function insertShip(array $data)
   {
     $name = $data["name"];
     $country = $data["country"];
@@ -165,64 +186,63 @@ class ShipsController extends ConnectionController
 
   /**
    * @param array $data
-	 * @param string $url
+   * @param string $url
    * @return json
    */
-	public function updateShip(array $data, string $url = null)
+  public function updateShip(array $data, string $url = null)
   {
-    if (!isset($data["id"])) {
+    $keys = ["id", "name", "country", "continent", "coordinates"];
+
+    if (!$data || !$this->getInArray($keys, $data) || !isset($data["id"])) {
       // Bad request
       response()->httpCode(400);
       return response()->json([
         "StatusMsg" => "Bad request",
         "StatusCode" => 400,
-				"detail" => "You need to send the id of the ship",
-				"instance" => $url,
+        "detail" => "You need to send the id of the ship",
+        "instance" => $url,
       ]);
     }
 
-    if (isset($data["id"])) {
-      $this->id = $data["id"];
-      if (isset($data["name"])) {
-        $this->name = $data["name"];
-      }
+    $this->id = $data["id"];
 
-      if (isset($data["country"])) {
-        $this->country = $data["country"];
-      }
-
-      if (isset($data["continent"])) {
-        $this->continent = $data["continent"];
-      }
-
-      if (isset($data["coordinates"])) {
-        $this->coordinates = $data["coordinates"];
-      }
-
-      $result = $this->updateShipData();
-
-      if ($result) {
-        response()->httpCode(200);
-        return response()->json([
-          "StatusMsg" => "OK",
-          "StatusCode" => 200,
-          "id" => $this->id,
-          "Ship" => $result,
-					"detail" => "Ship updated",
-					"instance" => $url,
-        ]);
-      }
-
-      if (!$result) {
-        response()->httpCode(500);
-        return response()->json([
-          "StatusMsg" => "Internal server error",
-          "StatusCode" => 500,
-					"detail" => "Ship not updated",
-					"instance" => $url,
-        ]);
-      }
+    if (isset($data["name"])) {
+      $this->name = $data["name"];
     }
+
+    if (isset($data["country"])) {
+      $this->country = $data["country"];
+    }
+
+    if (isset($data["continent"])) {
+      $this->continent = $data["continent"];
+    }
+
+    if (isset($data["coordinates"])) {
+      $this->coordinates = $data["coordinates"];
+    }
+
+    $result = $this->updateShipData();
+
+    if (!$result) {
+      response()->httpCode(500);
+      return response()->json([
+        "StatusMsg" => "Internal server error",
+        "StatusCode" => 500,
+        "detail" => "Ship not updated",
+        "instance" => $url,
+      ]);
+    }
+
+    response()->httpCode(200);
+    return response()->json([
+      "StatusMsg" => "OK",
+      "StatusCode" => 200,
+      "id" => $this->id,
+      "Ship" => $result,
+      "detail" => "Ship updated",
+      "instance" => $url,
+    ]);
   }
 
   /**
@@ -255,14 +275,18 @@ class ShipsController extends ConnectionController
 
     $response = parent::anyQuery($query);
 
-    if ($response >= 1) return $response;
+    if ($response >= 1) {
+      return $response;
+    }
 
-    if ($response < 1) return false;
+    if ($response < 1) {
+      return false;
+    }
   }
 
   /**
    *	@param array $data
-	 *	@param string $url
+   *	@param string $url
    *	@return json
    */
   public function deleteShip(array $data, string $url = null)
@@ -272,8 +296,8 @@ class ShipsController extends ConnectionController
       return response()->json([
         "StatusMsg" => "Bad request",
         "StatusCode" => 400,
-				"detail" => "You need to send the id of the ship",
-				"instance" => $url,
+        "detail" => "You need to send the id of the ship",
+        "instance" => $url,
       ]);
     }
 
@@ -289,8 +313,8 @@ class ShipsController extends ConnectionController
           "StatusCode" => 200,
           "id" => $this->id,
           "count" => $result,
-					"detail" => "Ship deleted",
-					"instance" => $url,
+          "detail" => "Ship deleted",
+          "instance" => $url,
         ]);
       }
 
@@ -299,8 +323,8 @@ class ShipsController extends ConnectionController
         return response()->json([
           "StatusMsg" => "Internal server error",
           "StatusCode" => 500,
-					"detail" => "Ship not deleted",
-					"instance" => $url,
+          "detail" => "Ship not deleted",
+          "instance" => $url,
         ]);
       }
     }
@@ -315,8 +339,12 @@ class ShipsController extends ConnectionController
 
     $response = parent::anyQuery($query);
 
-    if ($response >= 1) return $response;
-    if ($response < 1) return false;
+    if ($response >= 1) {
+      return $response;
+    }
+    if ($response < 1) {
+      return false;
+    }
   }
 
   /**
@@ -327,9 +355,13 @@ class ShipsController extends ConnectionController
     $query = "SELECT tokenID, userID, token, status FROM users_token WHERE token = '$this->token' AND status = 'active'";
     $response = parent::getData($query);
 
-    if ($response) return $response;
+    if ($response) {
+      return $response;
+    }
 
-    if (!$response)	return false;
+    if (!$response) {
+      return false;
+    }
   }
 
   /**
@@ -342,17 +374,21 @@ class ShipsController extends ConnectionController
 
     $response = parent::anyQuery($query);
 
-    if ($response >= 1) return $response;
+    if ($response >= 1) {
+      return $response;
+    }
 
-    if ($response < 1)	return false;
+    if ($response < 1) {
+      return false;
+    }
   }
 
   /**
    * @Route("/ships/{page?}")
-	 * @Method({"GET"})
-	 * @param int $page
-	 * @return json
-	 * @throws Exception
+   * @Method({"GET"})
+   * @param int $page
+   * @return json
+   * @throws Exception
    */
   public function getShipsAction($page = null): string
   {
@@ -365,54 +401,54 @@ class ShipsController extends ConnectionController
 
   /**
    *	@Route("/ships/{id}")
-	 *	@Method({"GET"})
-	 *	@param int $id
-	 *	@return json
-	 *	@throws Exception
+   *	@Method({"GET"})
+   *	@param int $id
+   *	@return json
+   *	@throws Exception
    */
   public function getShipAction($id): string
   {
-    $result = $this->getEmbarcacion(
-			$id,
-			url("ships", "ShipsController@getShipAction")
-		);
+    $result = $this->getShip(
+      $id,
+      url("ship", "ShipsController@getShipAction")
+    );
     return $result;
   }
 
   /**
    *	@Route("/ships")
-	 *	@Method({"POST"})
-	 *	@return json
-	 *	@throws Exception
+   *	@Method({"POST"})
+   *	@return json
+   *	@throws Exception
    */
   public function postShipsAction()
   {
     $object = input()->all();
-		$url = url("ships", "ShipsController@postShipsAction");
+    $url = url("ships", "ShipsController@postShipsAction");
 
     if (!empty($object)) {
-      $result = $this->createEmbarcacion($object, $url);
+      $result = $this->createShip($object, $url);
       return $result;
     } else {
       response()->httpCode(400);
       return response()->json([
         "StatusMsg" => "Bad request",
         "StatusCode" => 400,
-				"detail" => "Do not send empty data",
-				"instance" => $url,
+        "detail" => "Do not send empty data",
+        "instance" => $url,
       ]);
     }
   }
 
   /**
    * 	@Route("/ships")
-	 * 	@Method({"PUT"})
-	 * 	@return json
+   * 	@Method({"PUT"})
+   * 	@return json
    */
   public function putShipsAction()
   {
     $object = input()->all();
-		$url = url("ships", "ShipsController@putShipsAction");
+    $url = url("ships", "ShipsController@putShipsAction");
 
     if (!empty($object)) {
       $result = $this->updateShip($object, $url);
@@ -422,21 +458,21 @@ class ShipsController extends ConnectionController
       return response()->json([
         "StatusMsg" => "Bad request",
         "StatusCode" => 400,
-				"detail" => "Do not send empty data",
-				"instance" => $url,
+        "detail" => "Do not send empty data",
+        "instance" => $url,
       ]);
     }
   }
 
   /**
    *	@Route("/ships")
-	 *	@Method({"DELETE"})
-	 *	@return json
+   *	@Method({"DELETE"})
+   *	@return json
    */
   public function deleteShipsAction()
   {
     $object = input()->all();
-		$url = url("ships", "ShipsController@deleteShipsAction");
+    $url = url("ships", "ShipsController@deleteShipsAction");
 
     if (!empty($object)) {
       $result = $this->deleteShip($object, $url);
@@ -446,8 +482,8 @@ class ShipsController extends ConnectionController
       return response()->json([
         "StatusMsg" => "Bad request",
         "StatusCode" => 400,
-				"detail" => "Do not send empty data",
-				"instance" => $url,
+        "detail" => "Do not send empty data",
+        "instance" => $url,
       ]);
     }
   }

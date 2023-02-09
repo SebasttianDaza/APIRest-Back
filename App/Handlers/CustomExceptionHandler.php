@@ -17,6 +17,7 @@ class CustomExceptionHandler implements IExceptionHandler
     /* You can use the exception handler to format errors depending on the request and type. */
 
     if ($request->getUrl()->contains("/ships")) {
+      response()->httpCode($error->getCode());
       response()->json([
         "StatusMsg" => preg_replace("/\r|\n/", "", $error->getMessage()),
         "StatusCode" => $error->getCode(),
