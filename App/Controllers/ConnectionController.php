@@ -3,7 +3,7 @@ namespace Ships\Controllers;
 
 error_reporting(E_ERROR | E_PARSE);
 
-require_once(__DIR__ . "../../../vendor/autoload.php");
+require_once __DIR__ . "../../../vendor/autoload.php";
 use Ships\Controllers;
 use Dotenv;
 use PDO;
@@ -58,7 +58,7 @@ class ConnectionController extends UtilsController
    */
   public function getError(PDOException $e): void
   {
-    echo "Connection failed: " . $e->getMessage();
+    //echo "Connection failed: " . $e->getMessage();
   }
 
   /**
@@ -140,7 +140,7 @@ class ConnectionController extends UtilsController
    * @param string $table
    * @return array
    */
-  public function getItems(string $table,  int $start, int $count): array
+  public function getItems(string $table, int $start, int $count): array
   {
     $query = "SELECT * FROM $table LIMIT $start, $count";
     $response = $this->getData($query);
@@ -161,7 +161,55 @@ class ConnectionController extends UtilsController
 
     return $response;
   }
-  
+
+  /**
+   *  Get data from users table
+   * @param string $username
+   * @return array
+   * @return bool
+   */
+  public function getDataUsers(string $username, string $select): bool|array
+  {
+    $query = "SELECT $select, password, status FROM users WHERE username = '$username'";
+    $response = $this->getData($query);
+
+    return isset($response[0]["password"]) ? $response : false;
+  }
+
+  /**
+   * Set user in database
+   * @param string $username
+   * @param string $password
+   * @param string $email
+   * @return int
+   */
+  public function setUser(
+    string $username,
+    string $password,
+    string $email
+  ): int {
+    $query = "INSERT INTO users (username, password, email) VALUES ('$username', '$password', '$email')";
+    $response = $this->anyQueryID($query);
+
+    return $response;
+  }
+
+  /**
+   * Set token in database
+   * @param int $userID
+   * @param string $token
+   * @param int $state
+   * @return int
+   */
+  public function setToken(int $userID, string $token, int $state): int
+  {
+    $date = date("Y-m-d H:i:s");
+
+    $query = "INSERT INTO users_tokens (userID, token, status, created_at, updated_at) VALUES ($userID, '$token', $state, '$date', '$date')";
+    $response = $this->anyQuery($query);
+
+    return $response;
+  }
 }
 
 ?>

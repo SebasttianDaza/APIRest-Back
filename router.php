@@ -5,7 +5,7 @@
     require_once(__DIR__ . "/App/Controllers/UtilsController.php");
     require_once(__DIR__ . "/App/Controllers/ConnectionController.php");
     require_once(__DIR__ . '/App/Controllers/DefaultController.php');    
-    require_once(__DIR__ . "/App/Controllers/ServiceController.php");
+    require_once(__DIR__ . "/App/Controllers/ServicesController.php");
     require_once(__DIR__ . "/App/Controllers/ShipsController.php");
     require_once(__DIR__ . "/App/Controllers/SalesController.php");
     require_once(__DIR__ . "/App/Controllers/UsersController.php");

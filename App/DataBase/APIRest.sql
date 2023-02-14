@@ -120,3 +120,35 @@ INSERT INTO `sale` (
 ( NULL, 9, 123),
 ( NULL, 6, 123),
 ( NULL, 14, 345);
+
+
+-- Archicteture Users Table `users` -- Usuarios de la plataforma --
+
+CREATE TABLE IF NOT EXISTS `users` (
+    `userID` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `username` VARCHAR(45) NOT NULL,
+    `password` VARCHAR(45) NOT NULL,
+    `email` VARCHAR(45) NOT NULL,
+    `status` INT(11) NOT NULL DEFAULT 1, -- 1 = Active, 0 = Inactive
+    CONSTRAINT UNIQUE (email)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+INSERT INTO `users` (
+    `userID`,
+    `username`,
+    `password`,
+    `email`,
+    `status`
+) VALUES ( NULL, 'admin', 'admin', 'admin2002@gmail.com', status);
+
+-- Archicteture Table `users_tokens` -- Tokens de los usuarios --
+CREATE TABLE IF NOT EXISTS `users_tokens` (
+    `userID` INT(11) NOT NULL,
+    `token` VARCHAR(255) NOT NULL,
+    `status` INT(11) NOT NULL DEFAULT 1, -- 1 = Active, 0 = Inactive
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`userID`, `token`),
+    FOREIGN KEY (`userID`) REFERENCES `users`(`userID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

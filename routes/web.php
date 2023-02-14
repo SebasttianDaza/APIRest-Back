@@ -8,7 +8,9 @@ $dotenv->safeLoad();
 $routepath = $_ENV["ROUTE_MAIN"];
 
 /**
- * 
+ * @Route("/")
+ * @Middleware(\Ships\Middleware\DefaultMiddleware::class)
+ * @Controller("ServicesController)
  */
 Router::group(
   ["exceptionHandler" => \Ships\Handlers\CustomExceptionHandler::class],
@@ -16,8 +18,8 @@ Router::group(
     Router::get($_ENV["ROUTE_MAIN"], "DefaultController@home")->name("home");
 
     Router::post(
-      $_ENV["ROUTE_MAIN"] . "server/",
-      "ServiceController@register"
+      $_ENV["ROUTE_MAIN"] . "register/",
+      "ServicesController@register"
     )->name("register");
 
     Router::post(
