@@ -5,7 +5,7 @@ namespace Ships\Controllers;
 use Pecee\Http\Input\InputHandler;
 use Ships\Controllers;
 
-class ServiceController extends ConnectionController
+class ServicesController extends ConnectionController
 {
   public $data = [];
 
@@ -96,6 +96,43 @@ class ServiceController extends ConnectionController
   }
 
   /**
+   *  Set user in database
+   * @param array $response
+   * @param string $instance
+   * @return array
+   */
+  private function setRegister(array $response, string $instance): array
+  {
+    $this->data = $response;
+    // Destructuring data
+    extract($this->data, EXTR_PREFIX_SAME, "wddx");
+    $username;
+    $email;
+    $password;
+
+    $response = parent::setUser($username, $email, $password);
+
+    if ($response <= 0) {
+      response()->httpCode(409);
+      return response()->json([
+        "StatusMsg" => "Conflict",
+        "StatusCode" => 409,
+        "detail" => "User already exists",
+        "instance" => $instance,
+      ]);
+    }
+
+    // User created
+    response()->httpCode(200);
+    return response()->json([
+      "StatusMsg" => "Success",
+      "StatusCode" => 200,
+      "detail" => "User created successfully",
+      "instance" => $instance,
+    ]);
+  }
+
+  /**
    * Create token for user using
    * @param int $userID
    * @return string|bool
@@ -115,14 +152,14 @@ class ServiceController extends ConnectionController
    * @return json
    * @param json
    */
-  public function register(): string
+  public function registerAction(): string
   {
     $response = input()->all();
-    $url = url("register", "ServicesController@register");
+    $url = url("register", "ServicesController@registerAction");
 
     if (
       empty($response) ||
-      !parent::getInArray($response, ["username", "email", "password"])
+      parent::getInArray($response, ["username", "email", "password"])
     ) {
       response()->httpCode(500);
       return response()->json([
@@ -133,43 +170,7 @@ class ServiceController extends ConnectionController
       ]);
     }
 
-    $this->data = $response;
-    // Destructuring data
-    extract($this->data, EXTR_PREFIX_SAME, "wddx");
-    $username;
-    $email;
-    $password;
-
-    /*$query =
-      'INSERT INTO users (username, email, password, status) VALUES ("' .
-      $this->data["username"] .
-      '", "' .
-      $this->data["email"] .
-      '", "' .
-      $this->data["password"] .
-      '", "active")';
-
-    $response = parent::anyQuery($query);*/
-
-    $response = parent::setUser($username, $email, $password);
-
-    if ($response && $response >= 1) {
-      response()->httpCode(200);
-    }
-
-    if ($response >= 1) {
-      return response()->json([
-        "message" => "User created successfully",
-        "code" => 200,
-      ]);
-    }
-
-    if ($response == 0) {
-      return response()->json([
-        "message" => "User not created",
-        "code" => 500,
-      ]);
-    }
+    return $this->setRegister($response, $url);
   }
 
   /**

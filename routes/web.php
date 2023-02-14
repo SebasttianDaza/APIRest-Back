@@ -17,14 +17,16 @@ Router::group(
   function () {
     Router::get($_ENV["ROUTE_MAIN"], "DefaultController@home")->name("home");
 
+    // Register
     Router::post(
       $_ENV["ROUTE_MAIN"] . "register/",
-      "ServicesController@register"
+      "ServicesController@registerAction"
     )->name("register");
 
+    // Login and get token
     Router::post(
       $_ENV["ROUTE_MAIN"] . "auth/",
-      "ServiceController@authAction"
+      "ServicesController@authAction"
     )->name("auth");
   }
 );

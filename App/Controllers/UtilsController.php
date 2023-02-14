@@ -12,12 +12,10 @@ class UtilsController
 
   public function getInArray(array $array, array $array_keys): bool
   {
-    $result = true;
+    $result = false;
 
     foreach ($array_keys as $key) {
-      if (!array_key_exists($key, $array) || empty($array[$key])) {
-        return false;
-      }
+      if (!array_key_exists($key, $array) || empty($array[$key])) return true;
     }
 
     return $result;
