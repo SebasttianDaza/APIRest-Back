@@ -163,6 +163,19 @@ class ConnectionController extends UtilsController
   }
 
   /**
+   * 
+   */
+  public function setItem(string $table, array $data): int
+  {
+    $keys = implode(", ", array_keys($data));
+    $values = implode("', '", array_values($data));
+
+    $query = "INSERT INTO $table ({$keys}) VALUES ('{$values}')";
+
+    return $this->anyQueryID($query);
+  }
+
+  /**
    *  Get data from users table
    * @param string $username
    * @return array
@@ -209,6 +222,36 @@ class ConnectionController extends UtilsController
     $response = $this->anyQuery($query);
 
     return $response;
+  }
+
+  /**
+   * Get token from database
+   * @param string $token
+   * @return bool|array
+   */
+  public function getToken(string $token): bool|array
+  {
+    $query = "SELECT userID, token, status FROM users_tokens WHERE token = '$token' AND status = '1'";
+
+    $response = $this->getData($query);
+
+    return $response ? $response : false;
+  }
+
+
+  /**
+   * Update token in database
+   * @param int $userID
+   * @return bool|array
+   */
+  public function getUpdateToken(int $userID): bool|array
+  {
+    $date = date("Y-m-d H:i:s");
+    $query = "UPDATE users_tokens SET updated_at = '$date' WHERE userID = $userID";
+
+    $response = $this->anyQuery($query);
+
+    return $response >= 1 ? $response : false;
   }
 }
 
