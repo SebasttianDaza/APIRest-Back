@@ -163,7 +163,10 @@ class ConnectionController extends UtilsController
   }
 
   /**
-   * 
+   *  Set item in database
+   * @param string $table
+   * @param array $data
+   * @return int
    */
   public function setItem(string $table, array $data): int
   {
@@ -173,6 +176,36 @@ class ConnectionController extends UtilsController
     $query = "INSERT INTO $table ({$keys}) VALUES ('{$values}')";
 
     return $this->anyQueryID($query);
+  }
+
+  /**
+   * 
+   */
+  public function updateItem(string $table, array $data, int $id): int
+  {
+    $merge =  implode(", ", array_map(
+      function ($k, $v) {
+        return sprintf("%s='%s'", $k, $v);
+      },
+      array_keys($data),
+      array_values($data)
+    ));
+
+    $query = "UPDATE $table SET {$merge} WHERE id = $id";
+    $response = $this->anyQuery($query);
+
+    return $response >= 1 ? $response : false;
+  }
+
+  /**
+   * 
+   */
+  public function removeItem(string $table, int $id): int
+  {
+    $query = "DELETE FROM $table WHERE id = $id";
+    $response = $this->anyQuery($query);
+
+    return $response >= 1 ? $response : false;
   }
 
   /**

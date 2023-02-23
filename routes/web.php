@@ -1,7 +1,6 @@
 <?php
+
 use Ships\Router;
-require_once __DIR__ . "../../vendor/autoload.php";
-include __DIR__ . "../../App/Handlers/CustomExceptionHandler.php";
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__, "../.env");
 $dotenv->safeLoad();
@@ -36,7 +35,10 @@ Router::group(
  * @Middleware(\Ships\Middleware\ShipsMiddleware::class)
  */
 Router::group(
-  ["exceptionHandler" => \Ships\Handlers\CustomExceptionHandler::class],
+  [
+    "middleware" => \Ships\Middlewares\AuthMiddleware::class,
+    "exceptionHandler" => \Ships\Handlers\CustomExceptionHandler::class,
+  ],
   function () {
      /**
      * Load the entire controller (where url matches method names - getShipsAction() - getShipAction() ).
@@ -71,7 +73,7 @@ Router::group(
     )->name("putShip");
 
     Router::delete(
-      $_ENV["ROUTE_MAIN"] . "ships/",
+      $_ENV["ROUTE_MAIN"] . "ships/{id}",
       "ShipsController@deleteShipsAction"
     )->name("deleteShip");
   }
