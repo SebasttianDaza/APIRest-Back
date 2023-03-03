@@ -56,9 +56,14 @@ class ConnectionController extends UtilsController
    * @return void
    * Show error function
    */
-  public function getError(PDOException $e): void
+  public function getError(PDOException $e): array
   {
-    //echo "Connection failed: " . $e->getMessage();
+    response()->httpCode(500);
+    return response()->json([
+      "StatusMsg" => "Internal Server Error",
+      "StatusCode" => 500,
+      "detail" => $e->getMessage(),
+    ]);
   }
 
   /**

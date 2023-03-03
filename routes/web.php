@@ -80,7 +80,7 @@ Router::group(
 );
 
 Router::group(
-  ["exceptionHandler" => \Ships\Handlers\CustomExceptionHandler::class],
+  [],
   function () {
     Router::get(
       $_ENV["ROUTE_MAIN"] . "sales/{page}",
@@ -110,7 +110,7 @@ Router::group(
 );
 
 Router::group(
-  ["exceptionHandler" => \Ships\Handlers\CustomExceptionHandler::class],
+  [],
   function () {
     Router::get(
       $_ENV["ROUTE_MAIN"] . "users/{page}",

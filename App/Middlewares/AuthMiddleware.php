@@ -46,14 +46,24 @@ class AuthMiddleware implements IMiddleware
       empty($headers)
     ) {
       // Return throw exception
-      throw new HttpException($headers ? $headers : "No empty header", 401);
+      $this->httpException(
+        $headers ?? "Unauthorized or unauthenticated",
+        401,
+        $request->getUrl()
+      );
+      return;
     }
 
     $tokendb = $this->connectionController->getToken($headers);
 
     // Check if token is valid
     if (!$tokendb) {
-      throw new HttpException("Unauthorized or unauthenticated", 401);
+      $this->httpException(
+        "Unauthorized or unauthenticated",
+        401,
+        $request->getUrl()
+      );
+      return;
     }
 
     $responseToken = $this->connectionController->getUpdateToken(
@@ -61,8 +71,32 @@ class AuthMiddleware implements IMiddleware
     );
 
     if (!$responseToken) {
-      throw new HttpException("Internal server error", 500);
+      $this->httpException(
+        "Internal server error",
+        500,
+        $request->getUrl()
+      );
+      return;
     }
+  }
+
+  /**
+   * @param string $message
+   * @param int $code
+   * @param string $instance
+   * @return array
+   */
+  public function httpException(
+    string $message,
+    int $code,
+    string $instance
+  ): array {
+    response()->httpCode($code);
+    return response()->json([
+      "StatusMsg" => preg_replace("/\r|\n/", "", $message),
+      "StatusCode" => $code,
+      "instance" => preg_replace("/\r|\n/", "", $instance),
+    ]);
   }
 }
 
