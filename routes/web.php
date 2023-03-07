@@ -32,7 +32,7 @@ Router::group(
 
 /**
  * @Route("/ships")
- * @Middleware(\Ships\Middleware\ShipsMiddleware::class)
+ * @Middleware(\Ships\Middleware\AuthMiddleware::class)
  */
 Router::group(
   [
@@ -40,7 +40,7 @@ Router::group(
     "exceptionHandler" => \Ships\Handlers\CustomExceptionHandler::class,
   ],
   function () {
-     /**
+    /**
      * Load the entire controller (where url matches method names - getShipsAction() - getShipAction() ).
      * The url paths will determine which method to render.
      *
@@ -79,8 +79,15 @@ Router::group(
   }
 );
 
+/**
+ * @Route("/sales")
+ * @Middleware(\Ships\Middleware\AuthMiddleware::class)
+ */
 Router::group(
-  [],
+  [
+    "exceptionHandler" => \Ships\Handlers\SalesExceptionHandler::class,
+    "middleware" => \Ships\Middlewares\AuthMiddleware::class,
+  ],
   function () {
     Router::get(
       $_ENV["ROUTE_MAIN"] . "sales/{page}",
@@ -95,7 +102,7 @@ Router::group(
     Router::post(
       $_ENV["ROUTE_MAIN"] . "sales/",
       "SalesController@postSalesAction"
-    )->name("createShip");
+    )->name("postSale");
 
     Router::put(
       $_ENV["ROUTE_MAIN"] . "sales/",
@@ -103,41 +110,38 @@ Router::group(
     )->name("updateSale");
 
     Router::delete(
-      $_ENV["ROUTE_MAIN"] . "sales/",
+      $_ENV["ROUTE_MAIN"] . "sale/{id}",
       "SalesController@deleteSalesAction"
-    )->name("deleteSales");
+    )->name("deleteSale");
   }
 );
 
-Router::group(
-  [],
-  function () {
-    Router::get(
-      $_ENV["ROUTE_MAIN"] . "users/{page}",
-      "UsersController@getUsersAction"
-    )->name("users");
+Router::group([], function () {
+  Router::get(
+    $_ENV["ROUTE_MAIN"] . "users/{page}",
+    "UsersController@getUsersAction"
+  )->name("users");
 
-    Router::get(
-      $_ENV["ROUTE_MAIN"] . "user/{id}",
-      "UsersController@getUserAction"
-    )->name("user");
+  Router::get(
+    $_ENV["ROUTE_MAIN"] . "user/{id}",
+    "UsersController@getUserAction"
+  )->name("user");
 
-    Router::post(
-      $_ENV["ROUTE_MAIN"] . "users/",
-      "UsersController@postUsersAction"
-    )->name("createUser");
+  Router::post(
+    $_ENV["ROUTE_MAIN"] . "users/",
+    "UsersController@postUsersAction"
+  )->name("createUser");
 
-    Router::put(
-      $_ENV["ROUTE_MAIN"] . "users/",
-      "UsersController@putUsersAction"
-    )->name("updateUser");
+  Router::put(
+    $_ENV["ROUTE_MAIN"] . "users/",
+    "UsersController@putUsersAction"
+  )->name("updateUser");
 
-    Router::delete(
-      $_ENV["ROUTE_MAIN"] . "users/",
-      "UsersController@deleteUsersAction"
-    )->name("deleteUser");
-  }
-);
+  Router::delete(
+    $_ENV["ROUTE_MAIN"] . "users/",
+    "UsersController@deleteUsersAction"
+  )->name("deleteUser");
+});
 
 //New route home like
 

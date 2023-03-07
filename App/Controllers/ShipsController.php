@@ -4,11 +4,34 @@ namespace Ships\Controllers;
 
 class ShipsController extends ConnectionController
 {
+  /**
+   * @var int $id
+   */
   private $id;
+
+  /**
+   * @var string $name
+   */
   private $name = "";
+
+  /**
+   * @var string $country
+   */
   private $country = "";
+
+  /**
+   * @var string $continent
+   */
   private $continent = "";
+
+  /**
+   * @var string $coordinates
+   */
   private $coordinates = "";
+
+  /**
+   * @var string $token
+   */
   private $token = "";
 
   /**

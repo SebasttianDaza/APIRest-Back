@@ -159,9 +159,9 @@ class ConnectionController extends UtilsController
    * @param int $id
    * @return array
    */
-  public function getItemById(string $table, int $id): array
+  public function getItemById(string $table, int $id, $param = "id"): array
   {
-    $query = "SELECT * FROM $table WHERE id = $id";
+    $query = "SELECT * FROM $table WHERE $param = $id";
     $response = $this->getData($query);
 
     return $response;
