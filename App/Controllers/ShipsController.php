@@ -154,7 +154,7 @@ class ShipsController extends ConnectionController
    * @param string $url
    * @return json
    */
-  private function updateShip(array $data, string $url = null)
+  private function updateShip(array $data, string $url = null): array
   {
     // User not has id
     if (
@@ -193,7 +193,7 @@ class ShipsController extends ConnectionController
       "StatusMsg" => "OK",
       "StatusCode" => 200,
       "id" => $this->id,
-      "Ship" => $result,
+      "Ship" => $response,
       "detail" => "Ship updated",
       "instance" => $url,
     ]);
@@ -204,7 +204,7 @@ class ShipsController extends ConnectionController
    *	@param string $url
    *	@return json
    */
-  public function deleteShip(int $id, string $url = null)
+  private function deleteShip(int $id, string $url = null)
   {
     $response = parent::removeItem("Embarcaciones", $id);
 

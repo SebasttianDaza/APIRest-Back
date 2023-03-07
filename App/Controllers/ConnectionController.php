@@ -184,30 +184,37 @@ class ConnectionController extends UtilsController
   }
 
   /**
-   * 
+   *
    */
-  public function updateItem(string $table, array $data, int $id): int
-  {
-    $merge =  implode(", ", array_map(
-      function ($k, $v) {
-        return sprintf("%s='%s'", $k, $v);
-      },
-      array_keys($data),
-      array_values($data)
-    ));
+  public function updateItem(
+    string $table,
+    array $data,
+    int $id,
+    string $param = "id"
+  ): int {
+    $merge = implode(
+      ", ",
+      array_map(
+        function ($k, $v) {
+          return sprintf("%s='%s'", $k, $v);
+        },
+        array_keys($data),
+        array_values($data)
+      )
+    );
 
-    $query = "UPDATE $table SET {$merge} WHERE id = $id";
+    $query = "UPDATE $table SET {$merge} WHERE $param = $id";
     $response = $this->anyQuery($query);
 
     return $response >= 1 ? $response : false;
   }
 
   /**
-   * 
+   *
    */
-  public function removeItem(string $table, int $id): int
+  public function removeItem(string $table, int $id, string $param = "id"): int
   {
-    $query = "DELETE FROM $table WHERE id = $id";
+    $query = "DELETE FROM $table WHERE $param = $id";
     $response = $this->anyQuery($query);
 
     return $response >= 1 ? $response : false;
@@ -275,7 +282,6 @@ class ConnectionController extends UtilsController
 
     return $response ? $response : false;
   }
-
 
   /**
    * Update token in database

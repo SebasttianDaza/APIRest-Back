@@ -111,7 +111,7 @@ Router::group(
 
     Router::delete(
       $_ENV["ROUTE_MAIN"] . "sale/{id}",
-      "SalesController@deleteSalesAction"
+      "SalesController@deleteSaleAction"
     )->name("deleteSale");
   }
 );

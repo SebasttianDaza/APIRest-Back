@@ -134,185 +134,83 @@ class SalesController extends ConnectionController
   }
 
   /**
-   *
+   * @param array $data
+   * @param string $url
+   * @return array
    */
-  public function insertSale($data)
+  private function updateSale(array $data, string $url = null): array
   {
-    $this->embarcacionesID = $data["embarcacionesID"];
-    $this->quantity = $data["quantity"];
-
-    $query = "INSERT INTO sale (embarcacionesID, quantity) VALUES ('$this->embarcacionesID', '$this->quantity')";
-
-    $result = parent::anyQueryID($query);
-
-    if ($result) {
-      return $result;
-    }
-
-    if (!$result) {
-      return false;
-    }
-  }
-
-  /**
-   *
-   */
-  public function put($data)
-  {
-    if (!isset($data["saleID"])) {
+    if (
+      !array_key_exists("saleID", $data) ||
+      empty($data["saleID"]) ||
+      !is_numeric($data["saleID"]) ||
+      count($data) <= 1
+    ) {
+      response()->httpCode(400);
       return response()->json([
-        "status" => "error",
-        "data" => "Don't found saleID",
-        "code" => 404,
+        "StatusMsg" => "Bad request",
+        "StatusCode" => 400,
+        "detail" => "You need to send all information",
+        "instance" => $url,
       ]);
     }
 
-    if (isset($data["saleID"])) {
-      $this->saleID = $data["saleID"];
+    $this->saleID = $data["saleID"];
+    unset($data["saleID"]);
 
-      if (isset($data["embarcacionesID"])) {
-        $this->embarcacionesID = $data["embarcacionesID"];
-      }
+    $response = parent::updateItem("sale", $data, $this->saleID, "saleID");
 
-      if (isset($data["quantity"])) {
-        $this->quantity = $data["quantity"];
-      }
-
-      $result = $this->updateSale();
-
-      if ($result) {
-        return response()->json([
-          "status" => "success",
-          "data" => $result,
-          "code" => 200,
-        ]);
-      }
-
-      if (!$result) {
-        return response()->json([
-          "status" => "Internal server error",
-          "code" => 500,
-        ]);
-      }
-    }
-  }
-  /**
-   *
-   */
-  public function updateSale()
-  {
-    $query = "UPDATE sale SET ";
-
-    if ($this->embarcacionesID !== "") {
-      $query .= "embarcacionesID = '$this->embarcacionesID', ";
-    }
-
-    if ($this->quantity !== "") {
-      $query .= "quantity = '$this->quantity', ";
-    }
-
-    if (strlen($query) > strlen("UPDATE Embarcaciones SET ")) {
-      $query = substr($query, 0, strlen($query) - 2);
-    }
-
-    $query .= "WHERE saleID = $this->saleID";
-
-    $result = parent::anyQuery($query);
-
-    if ($result >= 1) {
-      return $result;
-    }
-
-    if ($result < 1) {
-      return false;
-    }
-  }
-
-  public function delete($data)
-  {
-    if (!isset($data["saleID"])) {
-      return response()->json([
-        "status" => "error",
-        "data" => "Don't found saleID",
-        "code" => 40,
-      ]);
-    }
-
-    if (isset($data["saleID"])) {
-      $this->saleID = $data["saleID"];
-
-      $result = $this->deleteSale();
-
-      if ($result) {
-        return response()->json([
-          "status" => "success",
-          "data" => $result,
-          "code" => 200,
-        ]);
-      }
-
-      if (!$result) {
-        return response()->json([
-          "status" => "Internal server error",
-          "code" => 500,
-        ]);
-      }
-    }
-  }
-
-  /**
-   *
-   */
-  public function deleteSale()
-  {
-    $query = "DELETE FROM sale WHERE saleID = $this->saleID";
-
-    $result = parent::anyQuery($query);
-
-    if ($result >= 1) {
-      return $result;
-    }
-
-    if ($result < 1) {
-      return false;
-    }
-  }
-
-  /**
-   *
-   */
-  private function searchToken()
-  {
-    $query = "SELECT userID, token, status FROM users_token WHERE token = '$this->token' AND status = 'active'";
-    $response = parent::getData($query);
-
-    if ($response) {
-      return $response;
-    }
 
     if (!$response) {
-      return false;
+      response()->httpCode(500);
+      return response()->json([
+        "StatusMsg" => "Internal server error",
+        "StatusCode" => 500,
+        "detail" => "Ship not updated",
+        "instance" => $url,
+      ]);
     }
+
+    response()->httpCode(200);
+    return response()->json([
+      "StatusMsg" => "OK",
+      "StatusCode" => 200,
+      "id" => $this->saleID,
+      "Sale" => $response,
+      "detail" => "Sale updated",
+      "instance" => $url,
+    ]);
   }
 
   /**
-   *
+   * @param int $id
+   * @param string $url
+   * @return array 
    */
-  private function updateToken($tokenId)
+  private function deleteSale(int $id, string $url = null): array
   {
-    $date = date("Y-m-d H:i:s");
-    $query = "UPDATE users_token SET date = '$date' WHERE id = $tokenId";
+    $response = parent::removeItem("sale", $id, "saleID");
 
-    $response = parent::anyQuery($query);
-
-    if ($response >= 1) {
-      return $response;
+    if (!$response) {
+      response()->httpCode(404);
+      return response()->json([
+        "StatusMsg" => "Not Found",
+        "StatusCode" => 404,
+        "detail" => "No ship found",
+        "instance" => $url ?? null,
+      ]);
     }
 
-    if ($response < 1) {
-      return false;
-    }
+    response()->httpCode(200);
+    return response()->json([
+      "StatusMsg" => "OK",
+      "StatusCode" => 200,
+      "Sale" => $response,
+      "detail" => "Sale deleted",
+      "instance" => $url ?? null,
+    ]);
   }
+
 
   /**
    * @Route("/sales/{page}")
@@ -371,42 +269,49 @@ class SalesController extends ConnectionController
   }
 
   /**
-   *
+   *  @Route("/sales")
+   * @Method({"PUT})
+   * @return json
    */
-  public function putSalesAction()
+  public function putSalesAction(): array
   {
-    $object = input()->all();
+    $put = input()->all();
+    $url = url("sales", "SalesController@putSalesAction");
 
-    if (!empty($object)) {
-      $result = $this->put($object);
-      return $result;
-    } else {
+    if (empty($put)) {
+      response()->httpCode(400);
       return response()->json([
-        "status" => "error",
-        "code" => 400,
-        "message" => "No se ha recibido ningun dato",
+        "StatusMsg" => "Bad request",
+        "StatusCode" => 400,
+        "detail" => "Do not send empty data",
+        "instance" => $url,
       ]);
     }
+
+    return $this->updateSale($put, $url);
   }
 
-  /**
-   *
+  
+   /**
+   *  @Route("/sale/{$id}")
+   * @Method({"DELETE"})
+   * @return json
    */
-
-  public function deleteSalesAction()
+  public function deleteSaleAction(int $id = null): array
   {
-    $object = input()->all();
+    $url = url("sale", "SalesController@deleteSaleAction");
 
-    if (!empty($object)) {
-      $result = $this->delete($object);
-      return $result;
-    } else {
+    if (empty($id)) {
+      response()->httpCode(400);
       return response()->json([
-        "status" => "error",
-        "code" => 400,
-        "message" => "No se ha recibido ningun dato",
+        "StatusMsg" => "Bad request",
+        "StatusCode" => 400,
+        "detail" => "Do not send empty data",
+        "instance" => $url,
       ]);
     }
+    
+    return self::deleteSale($id, $url);
   }
 }
 
