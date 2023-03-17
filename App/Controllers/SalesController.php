@@ -68,7 +68,7 @@ class SalesController extends ConnectionController
    * @author SebastianDaza
    * @return json
    */
-  private function getSale(int $id = 0, string $url = null)
+  private function getSale(int $id = 0, string $url = null): array
   {
     $response = parent::getItemById("sale", $id, "saleID");
     
@@ -128,7 +128,7 @@ class SalesController extends ConnectionController
       "StatusMsg" => "OK",
       "StatusCode" => 201,
       "detail" => "Sale created",
-      "data" => $resutl,
+      "data" => $response,
       "instance" => $url
     ]);
   }
@@ -196,7 +196,7 @@ class SalesController extends ConnectionController
       return response()->json([
         "StatusMsg" => "Not Found",
         "StatusCode" => 404,
-        "detail" => "No ship found",
+        "detail" => "No sale found",
         "instance" => $url ?? null,
       ]);
     }
@@ -222,7 +222,7 @@ class SalesController extends ConnectionController
    */
   public function getSalesAction(int $page = null): array
   {
-    return $this->getListSales(
+    return self::getListSales(
       $page,
       url("sales", "SalesController@getSalesAction")
     );
@@ -238,7 +238,7 @@ class SalesController extends ConnectionController
    */
   public function getSaleAction(int $id = null): array
   {
-    return $this->getSale(
+    return self::getSale(
       $id,
       url("sale", "SalesController@getSaleAction")
     );
@@ -265,11 +265,11 @@ class SalesController extends ConnectionController
       ]);
     }
 
-    return $this->createSale($post, $url);
+    return self::createSale($post, $url);
   }
 
   /**
-   *  @Route("/sales")
+   * @Route("/sales")
    * @Method({"PUT})
    * @return json
    */
@@ -288,7 +288,7 @@ class SalesController extends ConnectionController
       ]);
     }
 
-    return $this->updateSale($put, $url);
+    return self::updateSale($put, $url);
   }
 
   

@@ -5,19 +5,38 @@ use Ships\Controllers;
 
 class UsersController extends ConnectionController
 {
+  /**
+   * @var int $userID
+   */
   private $userID;
-  private $username = "";
-  private $lastname = "";
-  private $email = "";
-  private $embarcacionesID = "";
-  private $token = "";
 
   /**
-   * @param int $page
-   * @return json
-   * @description
+   * @var string $username
    */
-  public function getList(int $page = 1): json
+  private $username = "";
+
+  /**
+   * @var string $lastname
+   */
+  private $lastname = "";
+
+  /**
+   * @var string $email
+   */
+  private $email = "";
+
+  /**
+   * @var int $embarcacionesID
+   */
+  private $embarcacionesID = "";
+
+
+  /**
+   * Get users per page
+   * @param int $page
+   * @return array
+   */
+  private function getListUsers(int $page = 1, string $url = null): array
   {
     $start = 0;
     $count = 100;
@@ -27,392 +46,279 @@ class UsersController extends ConnectionController
       $count = $count * $page;
     }
 
-    $query = "SELECT * FROM usuarios LIMIT $start, $count";
-    $result = parent::getData($query);
+    $response = parent::getItems("usuarios", $start, $count);
 
-    if ($result) {
+    if (!$response) {
+      response()->httpCode(404);
       return response()->json([
-        "status" => "success",
-        "data" => $result,
-        "code" => 200,
+        "StatusMsg" => "Not found",
+        "StatusCode" => 404,
+        "detail" => "No sales found",
+        "instance" => $url ?? null
       ]);
     }
 
-    if (!$result) {
+    response()->httpCode(200);
+    return response()->json([
+      "Page" => $page,
+      "NextPage" => $page + 1,
+      "PrevPage" => $page - 1,
+      "StatusMsg" => "OK",
+      "StatusCode" => 200,
+      "Users" => $response,
+      "detail" => "It's a list of users",
+      "instance" => $url ?? null
+    ]);
+
+  }
+
+  /**
+   * Get user by id
+   * @param int $id
+   * @param string $url
+   * @author SebastianDaza
+   * @return json
+   */
+  private function getUser(int $id = 0, string $url = null): array
+  {
+    $response = parent::getItemById("usuarios", $id, "userID");
+
+    if (!$response) {
+      response()->httpCode(404);
       return response()->json([
-        "status" => "error",
-        "data" => 'Don\'t exist sales',
-        "code" => 404,
+        "StatusMsg" => "Not found",
+        "StatusCode" => 404,
+        "detail" => "No user found",
+        "instance" => $url ?? null
       ]);
     }
+
+    response()->httpCode(200);
+    return response()->json([
+      "StatusMsg" => "OK",
+      "StatusCode" => 200,
+      "User" => $response,
+      "detail" => "It's a user",
+      "instance" => $url ?? null
+    ]);
+  }
+
+  /**
+   * Create a user with all information
+   * @param array $data
+   * @return array
+   */
+  private function createUser(array $data, string $url = null): array
+  {
+    $keysneccesary = ["username", "lastname", "email", "embarcacionesID"];
+
+    if (parent::getInArray($data, $keysneccesary)) {
+      response()->httpCode(400);
+      return response()->json([
+        "StatusMsg" => "Bad request",
+        "StatusCode" => 400,
+        "detail" => "You need to send all information",
+        "instance" => $url
+      ]);
+    }
+
+    $response = parent::setItem("usuarios", $data);
+
+    if (!$response) {
+      response()->httpCode(500);
+      return response()->json([
+        "StatusMsg" => "Internal server error",
+        "StatusCode" => 500,
+        "detail" => "User not created",
+        "instance" => $url
+      ]);
+    }
+
+    response()->httpCode(201);
+    return response()->json([
+      "StatusMsg" => "OK",
+      "StatusCode" => 201,
+      "detail" => "Sale created",
+      "data" => $response,
+      "instance" => $url
+    ]);
+  }
+
+
+  /**
+   * @param array $data
+   * @param string $url
+   * @return array
+   */
+  private function updateUser(array $data, string $url = null): array
+  {
+    if (
+      !array_key_exists("userID", $data) ||
+      empty($data["userID"]) ||
+      !is_numeric($data["userID"]) ||
+      count($data) <= 1
+    ) {
+      response()->httpCode(400);
+      return response()->json([
+        "StatusMsg" => "Bad request",
+        "StatusCode" => 400,
+        "detail" => "You need to send all information",
+        "instance" => $url,
+      ]);
+    }
+
+    $this->userID = $data["userID"];
+    unset($data["userID"]);
+
+    $response = parent::updateItem("usuarios", $data, $this->userID, "userID");
+
+    if (!$response) {
+      response()->httpCode(500);
+      return response()->json([
+        "StatusMsg" => "Internal server error",
+        "StatusCode" => 500,
+        "detail" => "User not updated",
+        "instance" => $url,
+      ]);
+    }
+
+    response()->httpCode(200);
+    return response()->json([
+      "StatusMsg" => "OK",
+      "StatusCode" => 200,
+      "id" => $this->userID,
+      "Sale" => $response,
+      "detail" => "User updated",
+      "instance" => $url,
+    ]);
   }
 
   /**
    * @param int $id
+   * @param string $url
+   * @return array
    */
-  public function getUser(int $id = 0)
+  private function deleteUser(int $id, string $url = null): array
   {
-    $query = "SELECT * FROM usuarios WHERE userID = $id";
-    $result = parent::getData($query);
-
-    if ($result) {
-      return response()->json([
-        "status" => "success",
-        "data" => $result,
-        "code" => 200,
-      ]);
-    }
-
-    if (!$result) {
-      return response()->json([
-        "status" => "error",
-        "data" => 'Don\'t exist user',
-        "code" => 404,
-      ]);
-    }
-  }
-
-  /**
-   *
-   */
-  public function post($data)
-  {
-    if (!isset($data["token"])) {
-      return response()->json([
-        "status" => "error",
-        "data" => 'Don\'t exist token',
-        "code" => 401,
-      ]);
-    }
-
-    if (isset($data["token"])) {
-      $this->token = $data["token"];
-
-      $dataToken = $this->searchToken();
-
-      if ($dataToken) {
-        if (
-          !isset($data["username"]) ||
-          !isset($data["lastname"]) ||
-          !isset($data["email"]) ||
-          !isset($data["embarcacionesID"])
-        ) {
-          return response()->json([
-            "status" => "error",
-            "data" => 'Don\'t exist data',
-            "code" => 400,
-          ]);
-        } else {
-          $result = $this->insertUser($data);
-
-          if ($result) {
-            return response()->json([
-              "status" => "success",
-              "data" => $result,
-              "code" => 200,
-            ]);
-          }
-
-          if (!$result) {
-            return response()->json([
-              "status" => "error",
-              "data" => "Internal server error",
-              "code" => 500,
-            ]);
-          }
-        }
-      }
-
-      if (!$dataToken) {
-        return response()->json([
-          "status" => "error",
-          "data" => "Unauthorized",
-          "code" => 401,
-        ]);
-      }
-    }
-  }
-
-  /**
-   *
-   */
-  public function insertUser($data)
-  {
-    $this->username = $data["username"];
-    $this->lastname = $data["lastname"];
-    $this->email = $data["email"];
-    $this->embarcacionesID = $data["embarcacionesID"];
-
-    $query = "INSERT INTO usuarios (username, lastname, email, embarcacionesID) VALUES ('$this->username', '$this->lastname', '$this->email', '$this->embarcacionesID')";
-    $result = parent::anyQueryID($query);
-
-    if ($result) {
-      return $result;
-    }
-
-    if (!$result) {
-      return false;
-    }
-  }
-
-  /**
-   *
-   */
-  public function put($data)
-  {
-    if (!isset($data["userID"])) {
-      return response()->json([
-        "status" => "error",
-        "data" => 'Don\'t exist userID',
-        "code" => 400,
-      ]);
-    }
-
-    if (isset($data["userID"])) {
-      $this->userID = $data["userID"];
-
-      if (isset($data["username"])) {
-        $this->username = $data["username"];
-      }
-
-      if (isset($data["lastname"])) {
-        $this->lastname = $data["lastname"];
-      }
-
-      if (isset($data["email"])) {
-        $this->email = $data["email"];
-      }
-
-      if (isset($data["embarcacionesID"])) {
-        $this->embarcacionesID = $data["embarcacionesID"];
-      }
-
-      $result = $this->updateUser();
-
-      if ($result) {
-        return response()->json([
-          "status" => "success",
-          "data" => $result,
-          "code" => 200,
-        ]);
-      }
-
-      if (!$result) {
-        return response()->json([
-          "status" => "error",
-          "data" => "Internal server error",
-          "code" => 500,
-        ]);
-      }
-    }
-  }
-
-  /**
-   *
-   */
-  public function updateUser()
-  {
-    $query = "UPDATE usuarios SET";
-
-    if ($this->username !== "") {
-      $query .= " username = '$this->username', ";
-    }
-
-    if ($this->lastname !== "") {
-      $query .= " lastname = '$this->lastname', ";
-    }
-
-    if ($this->email !== "") {
-      $query .= " email = '$this->email', ";
-    }
-
-    if ($this->embarcacionesID !== "") {
-      $query .= " embarcacionesID = '$this->embarcacionesID', ";
-    }
-
-    //Si solo es uno, quita la ultima coma
-    if (strlen($query) > strlen("UPDATE Embarcaciones SET ")) {
-      $query = substr($query, 0, strlen($query) - 2);
-    }
-
-    $query .= " WHERE userID = $this->userID";
-
-    $result = parent::anyQuery($query);
-
-    if ($result >= 1) {
-      return $result;
-    }
-
-    if ($result < 1) {
-      return false;
-    }
-  }
-
-  /**
-   *
-   */
-  public function delete($data)
-  {
-    if (!isset($data["userID"])) {
-      return response()->json([
-        "status" => "error",
-        "data" => 'Don\'t exist userID',
-        "code" => 400,
-      ]);
-    }
-
-    if (isset($data["userID"])) {
-      $this->userID = $data["userID"];
-
-      $result = $this->deleteUser();
-
-      if ($result) {
-        return response()->json([
-          "status" => "success",
-          "data" => [
-            "userID" => $this->userID,
-            "count" => $result,
-          ],
-          "code" => 200,
-        ]);
-      }
-
-      if (!$result) {
-        return response()->json([
-          "status" => "error",
-          "data" => "Internal server error",
-          "code" => 500,
-        ]);
-      }
-    }
-  }
-
-  /**
-   *
-   */
-  public function deleteUser()
-  {
-    $query = "DELETE FROM usuarios WHERE userID = $this->userID";
-    $result = parent::anyQuery($query);
-
-    if ($result >= 1) {
-      return $result;
-    }
-
-    if ($result < 1) {
-      return false;
-    }
-  }
-
-  /**
-   *
-   */
-  private function searchToken()
-  {
-    $query = "SELECT userID, token, status FROM users_token WHERE token = '$this->token' AND status = 'active'";
-    $response = parent::getData($query);
-
-    if ($response) {
-      return $response;
-    }
+    $response = parent::removeItem("usuarios", $id, "userID");
 
     if (!$response) {
-      return false;
-    }
-  }
-
-  /**
-   *
-   */
-  private function updateToken($tokenId)
-  {
-    $date = date("Y-m-d H:i:s");
-    $query = "UPDATE users_token SET date = '$date' WHERE id = $tokenId";
-
-    $response = parent::anyQuery($query);
-
-    if ($response >= 1) {
-      return $response;
-    }
-
-    if ($response < 1) {
-      return false;
-    }
-  }
-
-  /**
-   *
-   */
-  public function getUsersAction($page = null): string
-  {
-    $result = $this->getList($page);
-    return $result;
-  }
-
-  /**
-   *
-   */
-  public function getUserAction($id): string
-  {
-    $result = $this->getUser($id);
-    return $result;
-  }
-
-  /**
-   *
-   */
-  public function postUsersAction()
-  {
-    $object = input()->all();
-
-    if (!empty($object)) {
-      $result = $this->post($object);
-      return $result;
-    } else {
+      response()->httpCode(404);
       return response()->json([
-        "status" => "error",
-        "code" => 400,
-        "message" => "No se ha recibido ningun dato",
+        "StatusMsg" => "Not Found",
+        "StatusCode" => 404,
+        "detail" => "No user found",
+        "instance" => $url ?? null,
       ]);
     }
+
+    response()->httpCode(200);
+    return response()->json([
+      "StatusMsg" => "OK",
+      "StatusCode" => 200,
+      "Sale" => $response,
+      "detail" => "User deleted",
+      "instance" => $url ?? null,
+    ]);
   }
 
   /**
-   *
+   * @Route("/users/{page}")
+   * #Method({"GET"})
+   * @param int $page
+   * @return array
+   * @throws Exception
+   * @author SebastianDaza
    */
-  public function putUsersAction()
+  public function getUsersAction($page = null): array
   {
-    $object = input()->all();
-
-    if (!empty($object)) {
-      $result = $this->put($object);
-      return $result;
-    } else {
-      return response()->json([
-        "status" => "error",
-        "code" => 400,
-        "message" => "No se ha recibido ningun dato",
-      ]);
-    }
+    return self::getListUsers(
+      $page,
+      url("users", "UserController@getUsersAction")
+    );
   }
 
   /**
-   *
+   * @Route("user/{id}")
+   * @Method({"GET"})
+   * @param int $id
+   * @throws Exception
+   * @return array
    */
-
-  public function deleteUsersAction()
+  public function getUserAction(int $id = null): array
   {
-    $object = input()->all();
+    return self::getUser(
+      $id,
+      url("user", "UserController@getUserAction")
+    );
+  }
 
-    if (!empty($object)) {
-      $result = $this->delete($object);
-      return $result;
-    } else {
+  /**
+   * @Route("/users")
+   * @Method({"POST"})
+   * @return json
+   * @throws Exception
+   */
+  public function postUsersAction(): array
+  {
+    $post = input()->all();
+    $url = url("users", "UsersController@postUsersAction");
+
+    if (empty($post)) {
+      response()->httpCode(400);
       return response()->json([
-        "status" => "error",
-        "code" => 400,
-        "message" => "No se ha recibido ningun dato",
+        "StatusMsg" => "Bad request",
+        "StatusCode" => 400,
+        "detail" => "Do not send empty data",
+        "instance" => $url,
       ]);
     }
+
+    return self::createUser($post, $url);
+  }
+
+  /**
+   * @Route("/users")
+   * @Method({"PUT"})
+   * @return array
+   */
+  public function putUsersAction(): array
+  {
+    $put = input()->all();
+    $url = url("users", "UsersController@putUsersAction");
+
+    if (empty($put)) {
+      response()->httpCode(400);
+      return response()->json([
+        "StatusMsg" => "Bad request",
+        "StatusCode" => 400,
+        "detail" => "Do not send empty data",
+        "instance" => $url,
+      ]);
+    }
+
+    return self::updateUser($put, $url);
+  }
+
+  /**
+   * @Route("/user/{$id}")
+   * @Method({"DELETE"})
+   * @return array
+   */
+  public function deleteUserAction(int $id = null): array
+  {
+    $url = url("user", "UserController@deleteUserAction");
+
+    if (empty($id)) {
+      response()->httpCode(400);
+      return response()->json([
+        "StatusMsg" => "Bad request",
+        "StatusCode" => 400,
+        "detail" => "Do not send empty data",
+        "instance" => $url,
+      ]);
+    }
+    
+    return self::deleteUser($id, $url);
   }
 }

@@ -6,6 +6,7 @@ use Pecee\SimpleRouter\SimpleRouter;
 require_once __DIR__ . "/App/Handlers/CustomExceptionHandler.php";
 require_once __DIR__ . "/App/Middlewares/AuthMiddleware.php";
 require_once __DIR__ . "/App/Handlers/SalesExceptionHandler.php";
+require_once __DIR__ . "/App/Handlers/UsersExceptionHandler.php";
 require_once __DIR__ . "/App/Controllers/UtilsController.php";
 require_once __DIR__ . "/App/Controllers/ConnectionController.php";
 require_once __DIR__ . "/App/Controllers/DefaultController.php";
@@ -36,5 +37,3 @@ class Router extends SimpleRouter
     parent::start();
   }
 }
-
-?>
