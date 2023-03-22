@@ -71,8 +71,23 @@ To clone and run this application, you'll need [Git](https://git-scm.com) and [P
 # Clone this repository
 $ git clone https://github.com/your-user-name/your-project-name
 
+$ docker-compose build
+
+$ docker-compose up -d
+
+$ docker exec -it 
+
+$ docker exec -it php-apache bash
+
+# Add this line
+<Directory "/var/www/html/mysite.com">
+  AllowOverride All
+</Directory>
+
+$ a2enmod rewrite
+
 # Install dependencies
-$ composer install
+$ cd /var/www/html/APIRest-Back && composer install
 
 # Run the app, you can use nginx or apache
 ```
