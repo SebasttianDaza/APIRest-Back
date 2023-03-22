@@ -68,7 +68,7 @@ class Router extends SimpleRouter
    */
   public static function loadMiddlewarres(string $root): void
   {
-    require_once $root . "/App/Middlewares/AuthMiddleware.php";
+    require_once $root . "/app/Middlewares/AuthMiddleware.php";
   }
 
   /**
@@ -79,9 +79,9 @@ class Router extends SimpleRouter
    */
   public static function loadHandlerException(string $root): void
   {
-    require_once $root . "/App/Handlers/CustomExceptionHandler.php";
-    require_once $root . "/App/Handlers/SalesExceptionHandler.php";
-    require_once $root . "/App/Handlers/UsersExceptionHandler.php";
+    require_once $root . "/app/Handlers/CustomExceptionHandler.php";
+    require_once $root . "/app/Handlers/SalesExceptionHandler.php";
+    require_once $root . "/app/Handlers/UsersExceptionHandler.php";
   }
 
   /**
@@ -92,13 +92,13 @@ class Router extends SimpleRouter
    */
   public static function loadControllers(string $root): void
   {
-    require_once $root . "/App/Controllers/UtilsController.php";
-    require_once $root . "/App/Controllers/ConnectionController.php";
-    require_once $root . "/App/Controllers/DefaultController.php";
-    require_once $root . "/App/Controllers/ServicesController.php";
-    require_once $root . "/App/Controllers/ShipsController.php";
-    require_once $root . "/App/Controllers/SalesController.php";
-    require_once $root . "/App/Controllers/UsersController.php";
+    require_once $root . "/app/Controllers/UtilsController.php";
+    require_once $root . "/app/Controllers/ConnectionController.php";
+    require_once $root . "/app/Controllers/DefaultController.php";
+    require_once $root . "/app/Controllers/ServicesController.php";
+    require_once $root . "/app/Controllers/ShipsController.php";
+    require_once $root . "/app/Controllers/SalesController.php";
+    require_once $root . "/app/Controllers/UsersController.php";
   }
 
   /**

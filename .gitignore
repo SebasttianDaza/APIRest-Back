@@ -28,7 +28,7 @@ composer.phar
 
 .env
 
-/App/DataBase/APIUsers.sql
+/app/DataBase/APIUsers.sql
 
 
 # Commit your application's lock file https://getcomposer.org/doc/01-basic-usage.md#commit-your-composer-lock-file-to-version-control
