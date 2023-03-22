@@ -4,18 +4,6 @@ namespace Ships\Controllers;
 class UtilsController
 {
   /**
-   * @param string $key
-   * @return string
-   * Get .env value
-   */
-  public function getEnv(string $key): string
-  {
-    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__, "../../../.env");
-    $dotenv->safeLoad();
-    return $_ENV[$key];
-  }
-
-  /**
    * @param array $array
    * @param array $array_keys
    * @return bool

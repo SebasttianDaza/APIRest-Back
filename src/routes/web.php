@@ -2,10 +2,6 @@
 
   use Ships\Router;
 
-  $dotenv = Dotenv\Dotenv::createImmutable(__DIR__, "../.env");
-  $dotenv->safeLoad();
-  $routepath = $_ENV["ROUTE_MAIN"];
-
   /**
    * @Route("/")
    * @Middleware(\Ships\Middleware\DefaultMiddleware::class)

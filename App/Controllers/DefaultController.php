@@ -1,8 +1,6 @@
 <?php
 
 namespace Ships\Controllers;
-require_once __DIR__ . "../../../vendor/autoload.php";
-use Dotenv;
 use Pecee\Http\Request;
 use Ships\Controllers\UtilsController;
 
@@ -26,8 +24,6 @@ class DefaultController
    */
   public function home()
   {
-    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__, "../../../.env");
-    $dotenv->safeLoad();
     return redirect($_ENV["URL_HOME"], 301);
   }
 

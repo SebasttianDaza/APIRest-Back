@@ -3,14 +3,9 @@ namespace Ships\Controllers;
 
 error_reporting(E_ERROR | E_PARSE);
 
-require_once __DIR__ . "../../../vendor/autoload.php";
 use Ships\Controllers;
-use Dotenv;
 use PDO;
 use PDOException;
-
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__, "../../.env");
-$dotenv->safeLoad();
 
 class ConnectionController extends UtilsController
 {
