@@ -51,7 +51,7 @@ class ShipsController extends ConnectionController
       $count = $count * $page;
     }
 
-    $response = parent::getItems("Embarcaciones", $start, $count);
+    $response = parent::getItems("embarcaciones", $start, $count);
 
     if (!$response) {
       response()->httpCode(404);
@@ -84,7 +84,7 @@ class ShipsController extends ConnectionController
    */
   private function getShip(int $id, string $url = null)
   {
-    $response = parent::getItemById("Embarcaciones", $id);
+    $response = parent::getItemById("embarcaciones", $id);
 
     if (!$response) {
       response()->httpCode(404);
@@ -126,7 +126,7 @@ class ShipsController extends ConnectionController
     }
 
     // Insert ship
-    $result = parent::setItem("Embarcaciones", $data);
+    $result = parent::setItem("embarcaciones", $data);
 
     // Error in insert
     if (!$result) {
@@ -176,7 +176,7 @@ class ShipsController extends ConnectionController
     // Remove id
     unset($data["id"]);
 
-    $response = parent::updateItem("Embarcaciones", $data, $this->id);
+    $response = parent::updateItem("embarcaciones", $data, $this->id);
 
     if (!$response) {
       response()->httpCode(500);
@@ -206,7 +206,7 @@ class ShipsController extends ConnectionController
    */
   private function deleteShip(int $id, string $url = null)
   {
-    $response = parent::removeItem("Embarcaciones", $id);
+    $response = parent::removeItem("embarcaciones", $id);
 
     if (!$response) {
       response()->httpCode(404);
