@@ -23,7 +23,7 @@ class ConnectionController extends UtilsController
   function __construct()
   {
     $this->host = $_ENV["HOST"];
-    $this->username = $_ENV["USERNAME"];
+    $this->username = $_ENV["USERNAME_DB"];
     $this->password = $_ENV["PASSWORD"];
     $this->database = $_ENV["DATABASE"];
     $this->port = $_ENV["PORT"];
