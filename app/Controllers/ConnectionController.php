@@ -22,11 +22,11 @@ class ConnectionController extends UtilsController
    */
   function __construct()
   {
-    $this->host = $_ENV["HOST"];
+    $this->host = $_ENV["HOST_DB"];
     $this->username = $_ENV["USERNAME_DB"];
-    $this->password = $_ENV["PASSWORD"];
+    $this->password = $_ENV["PASSWORD_DB"];
     $this->database = $_ENV["DATABASE"];
-    $this->port = $_ENV["PORT"];
+    $this->port = $_ENV["PORT_DB"];
 
     try {
       $options = [
