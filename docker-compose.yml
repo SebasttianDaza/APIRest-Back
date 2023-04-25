@@ -1,6 +1,25 @@
 version: '3.7'
 
 services:
+  web:
+    build: ${IMAGE_NGINX}
+    container_name: ${NAME_SERVER_NGINX}
+    ports:
+      - ${PORT_LOCAL_SERVER_NGINX}:${PORT_CONTAINER_SERVER_NGINX}
+    volumes:
+      - ${PATH_DIRECTORY_SERVER}:${PATH_DIRECTORY_SERVER_DEST}
+    links:
+      - php-fpm
+    depends_on:
+      - mysql
+    image: sebasttiandaza/${NAME_SERVER_NGINX}:v1.0.0
+  php-fpm:
+    build: ${IMAGE_PHP_FPM}
+    container_name: ${NAME_PHP_FPM}
+    volumes:
+      - ${PATH_DIRECTORY_SERVER}:${PATH_DIRECTORY_SERVER_DEST}
+    command: sh -c "composer install --ignore-platform-reqs"
+    image: sebasttiandaza/${NAME_PHP_FPM}:v1.0.0
   php-apache:
     build: ${IMAGE_PHP}
     container_name: ${NAME_SERVER}
@@ -10,6 +29,7 @@ services:
       - ${PATH_DIRECTORY_SERVER}:${PATH_DIRECTORY_SERVER_DEST}
     depends_on:
       - mysql
+    image: sebasttiandaza/${NAME_PHP_FPM}:v1.0.0
   mysql:
     image: ${IMAGE_DATABASE}
     container_name: ${NAME_DATABASE}

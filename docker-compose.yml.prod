@@ -1,0 +1,22 @@
+version: '3.7'
+
+services:
+  web:
+    build: ${IMAGE_NGINX}
+    container_name: ${NAME_SERVER_NGINX}
+    ports:
+      - ${PORT_LOCAL_SERVER_NGINX}:${PORT_CONTAINER_SERVER_NGINX}
+    volumes:
+      - ${PATH_DIRECTORY_SERVER}:${PATH_DIRECTORY_SERVER_DEST}
+    links:
+      - php-fpm
+  php-fpm:
+    build: ${IMAGE_PHP_FPM}
+    container_name: ${NAME_PHP_FPM}
+    volumes:
+      - ${PATH_DIRECTORY_SERVER}:${PATH_DIRECTORY_SERVER_DEST}
+  composer:
+    image: composer
+    volumes:
+      - ${PATH_DIRECTORY_SERVER}:${PATH_DIRECTORY_SERVER_DEST}
+    command: install
