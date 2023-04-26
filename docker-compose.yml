@@ -9,8 +9,6 @@ services:
     volumes:
       - ${PATH_DIRECTORY_SERVER}:${PATH_DIRECTORY_SERVER_DEST}
     restart: unless-stopped
-    depends_on:
-      - mysql
     image: ${IMAGE_NAME_USER}/${NAME_SERVER_NGINX}:${IMAGE_TAG}
     networks:
       - app-ships
@@ -20,7 +18,6 @@ services:
     restart: unless-stopped
     volumes:
       - ${PATH_DIRECTORY_SERVER}:${PATH_DIRECTORY_SERVER_DEST}
-    command: sh -c "composer install --ignore-platform-reqs"
     image: ${IMAGE_NAME_USER}/${NAME_PHP_FPM}:${IMAGE_TAG}
     networks:
       - app-ships
@@ -31,8 +28,8 @@ services:
       - ${PORT_LOCAL_SERVER_APACHE}:${PORT_CONTAINER_SERVER}
     volumes:
       - ${PATH_DIRECTORY_SERVER}:${PATH_DIRECTORY_SERVER_DEST}
-    depends_on:
-      - mysql
+    networks:
+      - app-ships
     image: ${IMAGE_NAME_USER}/${NAME_SERVER_APACHE}:${IMAGE_TAG}
   mysql:
     image: ${IMAGE_DATABASE}
@@ -50,6 +47,8 @@ services:
       - ${PORT_CONTAINER_DATABASE}
     volumes:
       - my-db:/var/lib/mysql
+    networks:
+      - app-ships
 networks:
   app-ships:
     driver: bridge
