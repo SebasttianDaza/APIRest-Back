@@ -5,11 +5,13 @@ services:
     build: ${IMAGE_NGINX}
     container_name: ${NAME_SERVER_NGINX}
     ports:
-      - ${PORT_LOCAL_SERVER_NGINX}:${PORT_CONTAINER_SERVER}
+      - ${PORT_LOCAL_SERVER_NGINX}:${PORT_CONTAINER_SERVER_NGINX}
     volumes:
       - ${PATH_DIRECTORY_SERVER}:${PATH_DIRECTORY_SERVER_DEST}
     restart: unless-stopped
-    image: ${IMAGE_NAME_USER}/${NAME_SERVER_NGINX}:${IMAGE_TAG}
+    depends_on:
+      - mysql
+    image: sebasttiandaza/${NAME_SERVER_NGINX}:v1.0.0
     networks:
       - app-ships
   php-fpm:
@@ -18,39 +20,10 @@ services:
     restart: unless-stopped
     volumes:
       - ${PATH_DIRECTORY_SERVER}:${PATH_DIRECTORY_SERVER_DEST}
-    image: ${IMAGE_NAME_USER}/${NAME_PHP_FPM}:${IMAGE_TAG}
-    networks:
-      - app-ships
-  php-apache:
-    build: ${IMAGE_APACHE}
-    container_name: ${NAME_SERVER_APACHE}
-    ports:
-      - ${PORT_LOCAL_SERVER_APACHE}:${PORT_CONTAINER_SERVER}
-    volumes:
-      - ${PATH_DIRECTORY_SERVER}:${PATH_DIRECTORY_SERVER_DEST}
-    networks:
-      - app-ships
-    image: ${IMAGE_NAME_USER}/${NAME_SERVER_APACHE}:${IMAGE_TAG}
-  mysql:
-    image: ${IMAGE_DATABASE}
-    container_name: ${NAME_DATABASE}
-    restart: always
-    ports:
-      - ${PORT_LOCAL_DATABASE}:${PORT_CONTAINER_DATABASE}
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD_DATABASE}
-      MYSQL_DATABASE: ${MYSQL_NAME_DATABASE}
-      MYSQL_USER: ${MYSQL_USER_DATABASE}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD_DATABASE}
-      MYSQL_VERSION: ${MYSQL_VERSION_DATABASE}
-    expose:
-      - ${PORT_CONTAINER_DATABASE}
-    volumes:
-      - my-db:/var/lib/mysql
+    command: sh -c "composer install --ignore-platform-reqs"
+    image: sebasttiandaza/${NAME_PHP_FPM}:v1.0.0
     networks:
       - app-ships
 networks:
   app-ships:
     driver: bridge
-volumes:
-  my-db:
