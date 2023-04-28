@@ -1,30 +1,29 @@
 version: '3.7'
 
 services:
-  php-apache:
-    build: ${IMAGE_PHP}
-    container_name: ${NAME_SERVER}
+  web:
+    build: ${IMAGE_NGINX}
+    container_name: ${NAME_SERVER_NGINX}
     ports:
-      - ${PORT_LOCAL_SERVER}:${PORT_CONTAINER_SERVER}
+      - ${PORT_LOCAL_SERVER_NGINX}:${PORT_CONTAINER_SERVER_NGINX}
     volumes:
       - ${PATH_DIRECTORY_SERVER}:${PATH_DIRECTORY_SERVER_DEST}
+    restart: unless-stopped
     depends_on:
       - mysql
-  mysql:
-    image: ${IMAGE_DATABASE}
-    container_name: ${NAME_DATABASE}
-    restart: always
-    ports:
-      - ${PORT_LOCAL_DATABASE}:${PORT_CONTAINER_DATABASE}
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD_DATABASE}
-      MYSQL_DATABASE: ${MYSQL_NAME_DATABASE}
-      MYSQL_USER: ${MYSQL_USER_DATABASE}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD_DATABASE}
-      MYSQL_VERSION: ${MYSQL_VERSION_DATABASE}
-    expose:
-      - ${PORT_CONTAINER_DATABASE}
+    image: sebasttiandaza/${NAME_SERVER_NGINX}:v1.0.0
+    networks:
+      - app-ships
+  php-fpm:
+    build: ${IMAGE_PHP_FPM}
+    container_name: ${NAME_PHP_FPM}
+    restart: unless-stopped
     volumes:
-      - my-db:/var/lib/mysql
-volumes:
-  my-db:
+      - ${PATH_DIRECTORY_SERVER}:${PATH_DIRECTORY_SERVER_DEST}
+    command: sh -c "composer install --ignore-platform-reqs"
+    image: sebasttiandaza/${NAME_PHP_FPM}:v1.0.0
+    networks:
+      - app-ships
+networks:
+  app-ships:
+    driver: bridge
