@@ -1,29 +1,30 @@
 version: '3.7'
 
 services:
-  web:
+  shipsrest-web:
     build: ${IMAGE_NGINX}
     container_name: ${NAME_SERVER_NGINX}
     ports:
-      - ${PORT_LOCAL_SERVER_NGINX}:${PORT_CONTAINER_SERVER_NGINX}
+      - ${PORT_LOCAL_SERVER_NGINX}:${PORT_CONTAINER_SERVER}
+      - ${PORT_LOCAL_SERVER_NGINX_SSL}:${PORT_CONTAINER_SERVER_SSL}
     volumes:
       - ${PATH_DIRECTORY_SERVER}:${PATH_DIRECTORY_SERVER_DEST}
     restart: unless-stopped
+    image: ${NAME_SERVER_NGINX}
     depends_on:
-      - mysql
-    image: sebasttiandaza/${NAME_SERVER_NGINX}:v1.0.0
+      - shipsrest-back
     networks:
-      - app-ships
-  php-fpm:
+      - shipsrest-network
+  shipsrest-back:
     build: ${IMAGE_PHP_FPM}
     container_name: ${NAME_PHP_FPM}
     restart: unless-stopped
     volumes:
       - ${PATH_DIRECTORY_SERVER}:${PATH_DIRECTORY_SERVER_DEST}
     command: sh -c "composer install --ignore-platform-reqs"
-    image: sebasttiandaza/${NAME_PHP_FPM}:v1.0.0
+    image: ${NAME_PHP_FPM}
     networks:
-      - app-ships
+      - shipsrest-network
 networks:
-  app-ships:
+  shipsrest-network:
     driver: bridge
